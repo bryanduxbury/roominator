@@ -5,6 +5,7 @@ The system is not a stand-alone scheduling solution - it's designed to complemen
 The project consists of three components: an application server for interfacing with Google Calendar, a master control unit for coordinating with the displays, and one or more display units. 
 
 Project goals:
+
  - Totally open-source hardware design and software
  - Keep system cost down: < $50 for displays, < $100 for the master
  - Easy to use and configure
