@@ -1,15 +1,27 @@
-#include "libraries/NetworkLayer/NetworkSlave.h"
-#include "Wire.h"
+#include <NetworkSlave.h>
+#include <Reservation.h>
+#include <Wire.h>
+#include <LiquidCrystal.h>
+
 NetworkSlave slave;
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 void setup() {
   Wire.begin(1);
-  Wire.onReceive(slave.parseData);
+  Wire.onReceive(callback);
 }
 
 void loop() {
   delay(100);
+  lcd.setCursor(0,0);
+  lcd.print("Your Name is: ");
+  lcd.print(slave.getName());
 }
+
+void callback(int numBytes) {
+  slave.parseData(numBytes); 
+}
+
 
 //const int buttonPin = 2;     // the number of the pushbutton pin
 //const int ledPin =  5;      // the number of the LED pin
