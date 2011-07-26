@@ -1,0 +1,34 @@
+
+= form_tag({:action => :setup_rooms, :controller => :room}, {:id => "rooms_form"}) do
+  %table#rooms_table
+    %tr{:align=>"left"}
+      %th Room Number
+      %th Room Name
+      %th Calendar ID
+      %th Calendar Name
+      %th Delete?
+      %th 
+        -# edit
+    - ## the data is added by javascript
+  = hidden_field_tag "num_cols", @rooms.length
+  %br
+  %br
+  %span{:style => "padding:5px; background-color: #EEEEEE; border: 1px solid #999999;"}
+    = link_to_function "Add Room", "create_blank_row();"
+  %br
+  %br
+  = submit_tag 'Save'
+- ## two javascript files
+= javascript_include_tag "rooms.js" # code without Ruby inserts
+= render :partial => "/room/rooms.js"      # code with Ruby inserts
+
+- ##  create_table "rooms", :force => true do |t|
+- ##    t.string   "calendar_name"
+- ##    t.integer  "calendar_id"
+- ##    t.string   "room_name"
+- ##    t.datetime "created_at"
+- ##    t.datetime "updated_at"
+- ##    t.integer  "room_number"
+- ##    t.string   "current_meeting"
+- ##    t.string   "next_meeting"
+- ##  end
