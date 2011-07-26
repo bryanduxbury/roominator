@@ -2,3 +2,10 @@ one:
   calendar_name: "Atlantis (np)"
   room_name: Atlantis
 
+two:
+  calendar_name: "Thule (np)"
+  room_name: Thule
+
+three:
+  calendar_name: "N America (p+proj)"
+  room_name: "North America"
