@@ -92,4 +92,5 @@ DEPENDENCIES
   gcal4ruby
   haml-rails
   rails (= 3.0.1)
+  ruby-debug
   sqlite3-ruby
