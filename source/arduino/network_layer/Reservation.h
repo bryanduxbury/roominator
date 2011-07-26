@@ -1,5 +1,12 @@
+#ifndef Reservation_h
+#define Reservation_h
 
-struct Reservation {
-  char * desc;
-  int reserved_secs;
-}
+class Reservation {
+  public:
+    Reservation();
+  private:
+    char* description;
+    int seconds;
+};
+
+#endif
