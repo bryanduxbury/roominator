@@ -1,4 +1,5 @@
 #include "NetworkSlave.h"
+#include "Wire.h"
 
 NetworkSlave::NetworkSlave() {
   name = 0;
@@ -8,6 +9,23 @@ NetworkSlave::NetworkSlave() {
   cancel_count_ack = 0;
   current_reservation = Reservation();
   next_reservation = Reservation();
+}
+
+void parse_data(int num_bytes {  
+  //First byte will be 0 (hopefully)
+  if (Wire.receive() != 0)
+  {
+    return;  
+  }
+  
+  byte name_length = Wire.receive();
+  char name[name_length];
+  
+  for(int i = 0; i < name_length; i++)
+  {
+    name[i] = Wire.receive();
+  }
+  this->name = name; 
 }
 
 char* NetworkSlave::get_name() {
