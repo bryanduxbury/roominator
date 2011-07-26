@@ -21,14 +21,17 @@ class RoomController < ApplicationController
                                             :start_time => Time.now,
                                             :end_time => Time.now + EVENT_LENGTH_INCREMENT,
                                             :where => room.room_name})
-    event.save
-    render :nothing => true
+    render :json => {:success => event.save}
   end
 
   def extend_event
     room = get_room(params[:room_number])
     event = get_current_event(room)
-    event.end_time = event.end_time + EVENT_LENGTH_INCREMENT
+    if event.present?
+      event.end_time = event.end_time + EVENT_LENGTH_INCREMENT
+    else
+      return redirect_to add_event, :room_number => params[:room_number]
+    end
     render :json => {:success => event.save}
   end
 
@@ -51,7 +54,10 @@ class RoomController < ApplicationController
   private
 
   def get_current_event(room)
-    events = GCal4Ruby::Event.find(@service, "", {'calendar' => room.calendar_id, 'start-max' => Time.now.utc.xmlschema, 'end-min' => Time.now.utc.xmlschema})
+    calendar = @service.calendars.select{|cal| cal.id == room.calendar_id}.first
+    events = calendar.events
+    # select any events not currently happening
+    events = events.select{|e| e.start_time < Time.now && e.end_time > Time.now }
     debugger
     events.first #there should only be one event at a time, if not we'll just ignore it
   end
