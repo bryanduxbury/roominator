@@ -8,11 +8,8 @@ class ApplicationController < ActionController::Base
   def authenticate_to_gcal
     if !@service
       auth_data = YAML::load(File.open("config/authentication.yml"))
-      begin
-        @service = GCal4Ruby::Service.new(auth_data[:email], auth_data[:password])
-      rescue AuthenticationFailedError
-        @service = nil #this oughta be nicer TODO
-      end
+      @service = GCal4Ruby::Service.new
+      @service.authenticate(auth_data['email'], auth_data['password'])
     end
   end
 

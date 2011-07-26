@@ -10,17 +10,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110726011558) do
+ActiveRecord::Schema.define(:version => 20110726074802) do
 
   create_table "rooms", :force => true do |t|
     t.string   "calendar_name"
-    t.integer  "calendar_id"
     t.string   "room_name"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "room_number"
     t.string   "current_meeting"
     t.string   "next_meeting"
+    t.string   "calendar_id"
   end
 
 end

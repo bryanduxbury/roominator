@@ -1,11 +1,18 @@
 one:
   calendar_name: "Atlantis (np)"
   room_name: Atlantis
+  room_number: 1
+  calendar_id: gisman%40oberlin.edu
 
 two:
   calendar_name: "Thule (np)"
   room_name: Thule
+  room_number: 2
+  calendar_id: gisman%40oberlin.edu
+
 
 three:
   calendar_name: "N America (p+proj)"
   room_name: "North America"
+  room_number: 3
+  calendar_id: gisman%40oberlin.edu
