@@ -4,13 +4,10 @@ class RoomController < ApplicationController
   before_filter :set_current_event, :only => [:add_event, :extend_event, :room_free?, :vacate]
   
   EVENT_LENGTH_INCREMENT = 15.minutes
+  OVERFLOW_VALUE = 255
   
   def index
     @rooms = Room.all
-  end
-  
-  def add_room
-    
   end
   
   # finds the calendar associated with the room number and adds an event of EVENT_LENGTH_INCREMENT to it
@@ -33,8 +30,21 @@ class RoomController < ApplicationController
   # gives slave id, reserved_button_presses, cancel_button_presses
   # returns current information
   def report
-    current_room = Room.find_by_room_number(params[:slave_id])
+    @room_number                = params[:room_number]
+    current_room                = Room.find_by_room_number(@room_number)
+    new_reserved_button_presses = params[:reserved_button_presses]
+    new_cancel_button_presses   = params[:cancel_button_presses]
     
+    delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
+    delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
+    
+    add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
+    cancel if delta_cancel_button_presses > 0
+    
+    current_room.reserved_button_presses = new_reserved_button_presses
+    current_room.reserved_button_presses = new_reserved_button_presses
+    
+    redirect_to get_status
   end
   
   # checks the calendar associated with the room specified, if there is currently an event it extends it by

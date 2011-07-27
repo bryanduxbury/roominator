@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @rooms = Room.find(:all) # :conditions => ""
+    @rooms = Room.all
   end
 
 end
