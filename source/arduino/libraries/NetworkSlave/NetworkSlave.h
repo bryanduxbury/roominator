@@ -5,12 +5,13 @@
 class NetworkSlave {
   public:
     NetworkSlave();
+    void parseData(int numBytes);
     char* getName();
     void incrementReservePressed();
     void incrementCancelPressed();
   
-    int get_acknowledgedReservePresses();
-    int get_acknowledgedCancelPresses();
+    int getAcknowledgedReservePresses();
+    int getAcknowledgedCancelPresses();
   
     Reservation getCurrentReservation();
     Reservation getNextReservation();
