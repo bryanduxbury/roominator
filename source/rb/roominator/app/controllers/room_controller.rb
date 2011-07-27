@@ -8,58 +8,6 @@ class RoomController < ApplicationController
   def index
     @rooms = Room.all
   end
-  
-  def add_room
-    
-  end
-
-  # finds the calendar associated with the room number and adds an event of EVENT_LENGTH_INCREMENT to it
-  # If there is already an event taking place, it extends that one instead
-  # params:
-  # room_number - the internal identifier of the room which is being booked
-    def add_event
-    if !@event
-      @event = GCal4Ruby::Event.new(@service, {:calendar => @calendar,
-                                              :title => "Roomination",
-                                              :start_time => Time.now,
-                                              :end_time => Time.now + EVENT_LENGTH_INCREMENT,
-                                              :where => @room.room_name})
-    else
-      return redirect_to :controller => :room, :action => :extend_event, :room_number => params[:room_number]
-    end
-    return render :json => {:success => @event.save}
-  end
-
-  # checks the calendar associated with the room specified, if there is currently an event it extends it by
-  # EVENT_LENGTH_INCREMENT, if there is none it redirects to add_event
-  # params:
-  # room_number - the internal identifier of the room which is being booked
-  def extend_event
-    if @event.present?
-      @event.end_time = @event.end_time + EVENT_LENGTH_INCREMENT
-    else
-      return redirect_to :controller => :room, :action => :add_event, :room_number => params[:room_number]
-    end
-    render :json => {:success => @event.save}
-  end
-
-  # returns false if there is currently an event happening on the calendar associated with params(:room_number) room
-  # true otherwise
-  def room_free
-    render :json => {:free => !@event}
-  end
-
-
-  def room_free?
-    room = get_room(params[:room_number])
-    render :json => {:free => !!get_current_event(room)}
-  end
-  
-  # gets the current event happening in this room and and changes its end time to right now
-  def vacate
-    @event.end_time = Time.now unless @event.nil?
-    render :json => {:success => @event.save}
-  end
 
   def setup_rooms
     existing_rooms = Rooms.find(:all)
@@ -88,12 +36,61 @@ class RoomController < ApplicationController
   def dev_null
     render :nothing => true
   end
+
+  # Returns the information to be displayed on the lcd screen and status lights
+  def get_status
+
+  end
   
   private
 
+  # finds the calendar associated with the room number and adds an event of EVENT_LENGTH_INCREMENT to it
+  # params:
+  # room_number - the internal identifier of the room which is being booked
+  def add_event(multiplier)
+    @event = GCal4Ruby::Event.new(@service, {:calendar => @calendar,
+                                            :title => "Roomination",
+                                            :start_time => Time.now,
+                                            :end_time => Time.now + EVENT_LENGTH_INCREMENT * multiplier,
+                                            :where => @room.room_name})
+    @event.save
+  end
+
+  # checks the calendar associated with the room specified, if there is currently an event it extends it by
+  # EVENT_LENGTH_INCREMENT, if there is none it does nothing
+  # params:
+  # room_number - the internal identifier of the room which is being booked
+  def extend_event(multiplier)
+    if @event.present?
+      @event.end_time = @event.end_time + EVENT_LENGTH_INCREMENT * multiplier
+      @event.save
+    end
+    @event.present?
+  end
+
+  def add_or_extend(multiplier)
+    if @event.present?
+      @event.end_time = @event.end_time + EVENT_LENGTH_INCREMENT * multiplier
+      return @event.save
+    else
+      return add_event(multiplier)
+    end
+  end
+
+  # returns false if there is currently an event happening on the calendar associated with params(:room_number) room
+  # true otherwise
+  def room_free
+    !@event
+  end
+
+  # gets the current event happening in this room and and changes its end time to right now
+  def cancel
+    @event.end_time = Time.now unless @event.nil?
+    return @event.save
+  end
+
   def set_current_event
-    @room = Room.find_by_room_number(params[:room_number]) rescue nil
-    debugger
+    @room = Room.find_by_room_number(@room_number) rescue nil
     return redirect_to :controller => :room, :action => :dev_null if @room.nil? #trash the request if the room number was absent or bad
     @calendar = @service.calendars.select{|cal| cal.id == @room.calendar_id}.first #grab the calendar for this room
     events = @calendar.events
