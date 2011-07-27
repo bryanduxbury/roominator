@@ -3,6 +3,8 @@ one:
   room_name: Atlantis
   room_number: 1
   calendar_id: gisman%40oberlin.edu
+  reserved_button_presses: 0
+  cancel_button_presses: 0
 
 two:
   calendar_name: "Thule (np)"

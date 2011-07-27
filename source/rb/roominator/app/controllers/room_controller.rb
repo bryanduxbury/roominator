@@ -5,7 +5,10 @@ class RoomController < ApplicationController
   
   EVENT_LENGTH_INCREMENT = 15.minutes
   OVERFLOW_VALUE = 255
-  
+  STATUS_GREEN = 0
+  STATUS_YELLOW = 1
+  STATUS_RED = 2
+
   def index
     @rooms = Room.all
   end
@@ -13,21 +16,24 @@ class RoomController < ApplicationController
   # gives slave id, reserved_button_presses, cancel_button_presses
   # returns current information
   def report
-    @room_number                = params[:room_number]
+    @room_number                = params[:room_number].to_i
     current_room                = Room.find_by_room_number(@room_number)
-    new_reserved_button_presses = params[:reserved_button_presses]
-    new_cancel_button_presses   = params[:cancel_button_presses]
+    new_reserved_button_presses = params[:reserved_button_presses].to_i
+    new_cancel_button_presses   = params[:cancel_button_presses].to_i
     
     delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
-    
-    add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
-    cancel if delta_cancel_button_presses > 0
+
+    if delta_cancel_button_presses > 0
+      cancel
+    else
+      add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
+    end
     
     current_room.reserved_button_presses = new_reserved_button_presses
     current_room.reserved_button_presses = new_reserved_button_presses
     
-    return get_status
+    render :json => get_status
   end
 
   def setup_rooms
@@ -61,53 +67,44 @@ class RoomController < ApplicationController
   
   private
 
-  def get_status
-
-  end
-
-  # finds the calendar associated with the room number and adds an event of EVENT_LENGTH_INCREMENT to it
-  # params:
-  # room_number - the internal identifier of the room which is being booked
-  def add_event(multiplier)
-    @event = GCal4Ruby::Event.new(@service, {:calendar => @calendar,
-                                            :title => "Roomination",
-                                            :start_time => Time.now,
-                                            :end_time => Time.now + EVENT_LENGTH_INCREMENT * multiplier,
-                                            :where => @room.room_name})
-    @event.save
-  end
-
-  # checks the calendar associated with the room specified, if there is currently an event it extends it by
-  # EVENT_LENGTH_INCREMENT, if there is none it does nothing
-  # params:
-  # room_number - the internal identifier of the room which is being booked
-  def extend_event(multiplier)
-    if @event.present?
-      @event.end_time = @event.end_time + EVENT_LENGTH_INCREMENT * multiplier
-      @event.save
-    end
-    @event.present?
-  end
-
   def add_or_extend(multiplier)
+    set_current_event
+    notice_message = ""
     if @event.present?
-      @event.end_time = @event.end_time + EVENT_LENGTH_INCREMENT * multiplier
-      return @event.save
+      multiplier.times do
+        if @event.end_time + EVENT_LENGTH_INCREMENT < @next_event.start_time
+          @event.end_time = @event.end_time + EVENT_LENGTH_INCREMENT
+        else
+          notice_message = "Room already booked"
+        end
+      end
     else
-      return add_event(multiplier)
+      now = Time.now
+      event_length = [@next_event.start_time - now, EVENT_LENGTH_INCREMENT * multiplier].min
+      @event = GCal4Ruby::Event.new(@service, {:calendar => @calendar,
+                                              :title => "Roomination",
+                                              :start_time => now.utc.xmlschema,
+                                              :end_time => (now + event_length).utc.xmlschema,
+                                              :where => @room.room_name})
     end
+    {:success => @event.save, :notice => notice_message}
   end
 
   # returns false if there is currently an event happening on the calendar associated with params(:room_number) room
   # true otherwise
   def room_free
+    set_current_event
     !@event
   end
 
   # gets the current event happening in this room and and changes its end time to right now
   def cancel
-    @event.end_time = Time.now unless @event.nil?
-    return @event.save
+    set_current_event
+    if @event.present?
+      @event.end_time = Time.now unless @event.nil?
+      return @event.save
+    end
+    return true
   end
 
   def set_current_event
@@ -115,21 +112,35 @@ class RoomController < ApplicationController
     return redirect_to :controller => :room, :action => :dev_null if @room.nil? #trash the request if the room number was absent or bad
     @calendar = @service.calendars.select{|cal| cal.id == @room.calendar_id}.first #grab the calendar for this room
     events = @calendar.events
-    events = events.select{|e| e.start_time < Time.now && e.end_time > Time.now } #select the events who start-end span includes now
-    @event = events.first #there should only be one event at a time, if not we'll just ignore it
+    current = events.select{|e| e.start_time < Time.now && e.end_time > Time.now } #select the events who start-end span includes now
+    @event = current.first #there should only be one event at a time, if not we'll just ignore it
+    next_events = events.select{|e| e.start_time > Time.now}
+    @next_event = next_events.sort_by{|e| e.start_time}.first
+    @next_event = GCal4Ruby::Event.new(@service, {:start_time => (Time.now + 10.years).utc.xmlschema}) if @next_event.nil? #dummy event if there's nothing on the calendar
+  end
+
+  def get_status
+    #get the current event, time until it ends
+    set_current_event
+    occupied_until = @event ? @event.end_time : nil
+    occupied_next = @next_event ? @next_event.start_time : nil
+    #get the next event, time until it starts
+
+
+    #get the name of the room
+    room_name = @room.calendar_name
+
+
+    #infer the color status
+    if @event
+      status = STATUS_RED
+    elsif @next_event.start_time < Time.now + 15.minutes
+      status = STATUS_YELLOW
+    else
+      status = STATUS_GREEN
+    end
+
+    #other info? check with bri/yan
+    return {:status => status, :room_name => room_name, :occupied_until => occupied_until, :occupied_next => occupied_next}
   end
 end
-
-# t.string   "calendar_name"
-# t.integer  "calendar_id"
-# t.string   "room_name"
-# t.datetime "created_at"
-# t.datetime "updated_at"
-# t.integer  "room_number"
-# t.string   "current_meeting"
-# t.string   "next_meeting"
-
-
-current reservation
-next reservation
-name of the room
