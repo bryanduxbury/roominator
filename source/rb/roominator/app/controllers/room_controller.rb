@@ -24,6 +24,11 @@ class RoomController < ApplicationController
     render :json => {:success => event.save}
   end
   
+  def report
+    # gives slave id, reserved_button_presses, cancel_button_presses
+    # returns current information
+  end
+  
   def extend_event
     room = get_room(params[:room_number])
     event = get_current_event(room)
@@ -54,9 +59,10 @@ class RoomController < ApplicationController
       if row < existing_rooms.length # row already exists in the table
         room = existing_rooms[row]
         room.destroy and next if params["delete_#{row}"]
+        room.updated_at = Time.now
       else
         next if params["delete_#{row}"]
-        room = Rooms.new(:created_at => Time.now, :created_at => Time.now)
+        room = Rooms.new(:created_at => Time.now, :updated_at => Time.now)
       end
       
       room.calendar_name = params["text_c_name_#{row}"]
