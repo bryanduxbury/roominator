@@ -38,11 +38,15 @@ class RoomController < ApplicationController
     delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
     
-    add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
-    cancel if delta_cancel_button_presses > 0
+    if delta_cancel_button_presses > 0
+      cancel()
+    else
+      add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
+    end
     
     current_room.reserved_button_presses = new_reserved_button_presses
     current_room.reserved_button_presses = new_reserved_button_presses
+    current_room.save!
     
     redirect_to get_status
   end
