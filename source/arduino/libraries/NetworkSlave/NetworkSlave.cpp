@@ -3,7 +3,7 @@
 #include "WProgram.h"
 
 NetworkSlave::NetworkSlave() {
-  name = 0;
+  name = "Uninitialized";
   reserveCount = 0;
   cancelCount = 0;
   reserveCountAck = 0;
@@ -20,15 +20,10 @@ void NetworkSlave::parseData(int numBytes) {
       Serial.print("Exiting, first byte was not 0");
       return;
     }
-    parseName();        
-    int nameLength = Wire.receive();
-    char name_data[nameLength];
-        
-    for(int i = 0; i < nameLength; i++)
-    {
-      name_data[i] = Wire.receive();
-    }
-    this->name = name_data;
+    //Takes name length byte, and name off wire and saves in datastructure
+    parseName();      
+    
+    //Dump rest of bits in case of miscalculation
     while(Wire.available())
     {
       Serial.println("Should not enter this, miscalculated number of bytes in string");
@@ -38,17 +33,14 @@ void NetworkSlave::parseData(int numBytes) {
 
 void NetworkSlave::parseName() {
   int nameLength = Wire.receive();
-  char name_data[nameLength];
-      
+  realloc(name, nameLength + 1);
+  
   for(int i = 0; i < nameLength; i++)
   {
-    name_data[i] = Wire.receive();
+    name[i] = Wire.receive();
   }
-  
-  this->name = name_data;
-  
-  //Free the temp string we were using
-  free(name_data);
+  //Null terminate
+  name[nameLength] = '\0';
 }
 
 char* NetworkSlave::getName() {

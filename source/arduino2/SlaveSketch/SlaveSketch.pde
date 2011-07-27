@@ -13,21 +13,13 @@ NetworkSlave slave;
 //BounceButton reserve(2);
 //BounceButton cancel(3);
 
-int click;
-
-int ledPin = 5;
-
 
 void setup() {
-  reserve.initialize();
-  cancel.initialize();
-  slave.setName("conference room");  
+  //reserve.initialize();
+  //cancel.initialize();
   Serial.begin(9600);  
   Wire.begin(1);
   Wire.onReceive(callback); 
-  
-  click = 0;
-  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
@@ -39,15 +31,14 @@ void loop() {
   //lcd.print("Your Name is: ");
   //lcd.print(slave.getName());
   
-  if (reserve.check()) {  
-    slave.incrementReservePressed();
-    lcd.print(slave.getReserveCount());
-  }
+//  if (reserve.check()) {
+//    slave.incrementReservePressed();
+//  }
+//  
+//  if (cancel.check()) {
+//    slave.incrementCancelPressed();
+//  }
   
-  if (cancel.check()) {
-    slave.incrementCancelPressed();
-    lcd.print(slave.getCancelCount());
-  }
 }
 
 void callback(int numBytes) {

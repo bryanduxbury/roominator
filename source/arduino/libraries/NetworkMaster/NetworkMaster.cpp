@@ -1,7 +1,10 @@
 #include "NetworkMaster.h"
+#include "Wire.h"
+#include "string.h"
+#include "stdlib.h"
 
 NetworkMaster::NetworkMaster() {
-  name = 0;
+  name = "Unintialized";
   reserveCount = 0;
   cancelCount = 0;
   reserveCountAck = 0;
@@ -10,8 +13,24 @@ NetworkMaster::NetworkMaster() {
   nextReservation = Reservation();
 }
 
+void NetworkMaster::sendData(int address) {
+  Wire.beginTransmission(address);
+  Wire.send(0);
+  sendName();
+  sendReservation(currentReservation);    
+  sendReservation(nextReservation);
+  Wire.endTransmission();
+}
+
+void NetworkMaster::sendName() {
+  int nameLength = strlen(name);
+  Wire.send(nameLength);
+  Wire.send(name);  
+}
+
 void NetworkMaster::setName(char* name) {
-  this->name = name;
+  free(this->name);
+  this->name = name;  
 }
 
 void NetworkMaster::incrementReserveAcknowledged() {

@@ -6,6 +6,10 @@
 class NetworkMaster {
   public:
     NetworkMaster();
+    void sendData(int address);
+    void sendName();
+    void sendReservation(Reservation reservation);
+    
     void setName(char * name);
     void incrementReserveAcknowledged();
     void incrementCancelAcknowledged();
