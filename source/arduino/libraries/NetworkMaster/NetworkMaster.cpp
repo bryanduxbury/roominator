@@ -16,7 +16,9 @@ NetworkMaster::NetworkMaster() {
 void NetworkMaster::sendData(int address) {
   Wire.beginTransmission(address);
   Wire.send(0);
-  sendName();    
+  sendName();
+  sendReservation(currentReservation);    
+  sendReservation(nextReservation);
   Wire.endTransmission();
 }
 
