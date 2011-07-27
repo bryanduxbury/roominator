@@ -1,16 +1,19 @@
+#include <string.h>
 #include <Wire.h>
+#include <NetworkMaster.h>
+
+
+NetworkMaster master;
 
 void setup() {
+  master.setName("o hai");
+  
   //Serial.begin(9600); //For debugging
   Wire.begin();
 }
 
 void loop() {
-  Wire.beginTransmission(1);
-  Wire.send(0);
-  Wire.send(5);
-  Wire.send("OREO");
-  Wire.endTransmission();
+  master.sendData(1);
   delay(100);
 }
 

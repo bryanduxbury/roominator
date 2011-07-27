@@ -6,6 +6,8 @@
 class NetworkMaster {
   public:
     NetworkMaster();
+    void sendData(int address);
+    void sendName();
     void setName(char * name);
     void incrementReserveAcknowledged();
     void incrementCancelAcknowledged();

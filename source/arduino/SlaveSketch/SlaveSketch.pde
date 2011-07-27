@@ -7,16 +7,17 @@
 #include <string.h>
 
 NetworkSlave slave;
-DisplayController dc("name");
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+//DisplayController dc("name");
+//LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
-BounceButton reserve(2);
-BounceButton cancel(3);
+//BounceButton reserve(2);
+//BounceButton cancel(3);
 
 
 void setup() {
-  reserve.initialize();
-  cancel.initialize();  
+  //reserve.initialize();
+  //cancel.initialize();
+  Serial.begin(9600);  
   Wire.begin(1);
   Wire.onReceive(callback); 
 }
@@ -24,17 +25,19 @@ void setup() {
 void loop() {
   
   delay(100);
-  lcd.setCursor(0,0);
-  lcd.print("Your Name is: ");
-  lcd.print(slave.getName());
+  Serial.print("My name is: ");
+  Serial.println(slave.getName());
+  //lcd.setCursor(0,0);
+  //lcd.print("Your Name is: ");
+  //lcd.print(slave.getName());
   
-  if (reserve.check()) {
-    slave.incrementReservePressed();
-  }
-  
-  if (cancel.check()) {
-    slave.incrementCancelPressed();
-  }
+//  if (reserve.check()) {
+//    slave.incrementReservePressed();
+//  }
+//  
+//  if (cancel.check()) {
+//    slave.incrementCancelPressed();
+//  }
   
 }
 
