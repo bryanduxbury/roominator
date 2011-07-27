@@ -4,18 +4,15 @@
 class NetworkSlave {
   public:
     NetworkSlave();
-    void onRequest();
-    void onReceive();
+    byte* getUpstreamData();
+    void processDownstreamData(byte *);
+    void reserve();
+    void cancel();
+    char* getDisplayString();
   
   private:
-    int reserve;
-    bool cancel;
-    bool currentReservation;
-    bool pendingReservation;
-    
-    UpstreamData getUpstreamData();
-    DownstreamData getDownstreamData();
+    UpstreamData *ud
+    DownstreamData *dd;
 };
 
 #endif
-
