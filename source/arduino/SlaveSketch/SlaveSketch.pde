@@ -1,6 +1,8 @@
-#include "libraries/NetworkLayer/NetworkSlave.h"
-#include "Wire.h"
+#include <NetworkSlave.h>
+#include <DisplayController.h>
+
 NetworkSlave slave;
+DisplayControl dc("name");
 
 void setup() {
   Wire.begin(1);
@@ -8,6 +10,7 @@ void setup() {
 }
 
 void loop() {
+  
   delay(100);
 }
 
