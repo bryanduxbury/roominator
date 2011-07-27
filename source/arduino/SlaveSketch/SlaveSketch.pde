@@ -1,14 +1,13 @@
+#include <Wire.h>
+#include <LiquidCrystal.h>
 #include <NetworkSlave.h>
 #include <DisplayController.h>
 #include <Reservation.h>
 #include <BounceButton.h>
-#include <Wire.h>
-#include <LiquidCrystal.h>
+#include <string.h>
 
 NetworkSlave slave;
-DisplayControl dc("name");
-
-NetworkSlave slave;
+DisplayController dc("name");
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 BounceButton reserve(2);
@@ -19,8 +18,7 @@ void setup() {
   reserve.initialize();
   cancel.initialize();  
   Wire.begin(1);
-  Wire.onReceive(callback);
-  
+  Wire.onReceive(callback); 
 }
 
 void loop() {
@@ -31,11 +29,11 @@ void loop() {
   lcd.print(slave.getName());
   
   if (reserve.check()) {
-    slave.incrementReservePressed()
+    slave.incrementReservePressed();
   }
   
   if (cancel.check()) {
-    slave.incrementCancelPressed()
+    slave.incrementCancelPressed();
   }
   
 }

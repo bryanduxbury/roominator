@@ -3,7 +3,7 @@
 
 class BounceButton {
 	public:
-		BounceButton(int pin);
+		BounceButton(int pin_number);
 		void initialize();
 		int getState();
 		int getLastState();
@@ -15,4 +15,6 @@ class BounceButton {
 		int currentState;
 		int lastState;
 		long lastDebounceTime;
-}
+};
+
+#endif
