@@ -68,6 +68,14 @@ void NetworkSlave::incrementCancelPressed() {
   cancelCount++;
 }
 
+int NetworkSlave::getReserveCount() {
+	return reserveCount;
+}
+
+int NetworkSlave::getCancelCount() {
+	return cancelCount;
+}
+
 int NetworkSlave::getAcknowledgedReservePresses() {
   return reserveCountAck;
 }

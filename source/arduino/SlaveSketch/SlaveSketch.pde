@@ -13,12 +13,20 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 BounceButton reserve(2);
 BounceButton cancel(3);
 
+int click;
+
+int ledPin = 5;
+
 
 void setup() {
   reserve.initialize();
-  cancel.initialize();  
+  cancel.initialize();
+  slave.setName("conference room");  
   Wire.begin(1);
   Wire.onReceive(callback); 
+  
+  click = 0;
+  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
@@ -28,12 +36,14 @@ void loop() {
   lcd.print("Your Name is: ");
   lcd.print(slave.getName());
   
-  if (reserve.check()) {
+  if (reserve.check()) {  
     slave.incrementReservePressed();
+    lcd.print(slave.getReserveCount());
   }
   
   if (cancel.check()) {
     slave.incrementCancelPressed();
+    lcd.print(slave.getCancelCount());
   }
   
 }

@@ -14,6 +14,7 @@ class BounceButton {
 		int pin;
 		int currentState;
 		int lastState;
+		int lastSavedState;
 		long lastDebounceTime;
 };
 

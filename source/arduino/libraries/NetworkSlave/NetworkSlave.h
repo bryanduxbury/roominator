@@ -11,6 +11,8 @@ class NetworkSlave {
     void setName(char* name);
     void incrementReservePressed();
     void incrementCancelPressed();
+    int getReserveCount();
+    int getCancelCount();
   
     int getAcknowledgedReservePresses();
     int getAcknowledgedCancelPresses();
