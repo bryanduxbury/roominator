@@ -1,0 +1,22 @@
+#room-list
+  %table
+    %tr
+      %th
+        Room
+      %th
+        Occupied?
+      %th
+        Next Meeting
+      %th
+        Reserve
+    - @rooms.each do |r|    #note that this is basically a stub fro whatever data structure I actually use
+      %tr
+        %td
+          = r.room_name
+        %td
+          =# r.current_event
+        %td
+          =# r.next_event
+        %td
+          =# reserve link
+
