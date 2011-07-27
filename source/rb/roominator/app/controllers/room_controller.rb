@@ -2,23 +2,45 @@ class RoomController < ApplicationController
   
   before_filter :authenticate_to_gcal
   before_filter :set_current_event, :only => [:add_event, :extend_event, :room_free?, :vacate]
-
+  
   EVENT_LENGTH_INCREMENT = 15.minutes
+  OVERFLOW_VALUE = 255
   
   def index
     @rooms = Room.all
   end
+  
+  # gives slave id, reserved_button_presses, cancel_button_presses
+  # returns current information
+  def report
+    @room_number                = params[:room_number]
+    current_room                = Room.find_by_room_number(@room_number)
+    new_reserved_button_presses = params[:reserved_button_presses]
+    new_cancel_button_presses   = params[:cancel_button_presses]
+    
+    delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
+    delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
+    
+    add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
+    cancel if delta_cancel_button_presses > 0
+    
+    current_room.reserved_button_presses = new_reserved_button_presses
+    current_room.reserved_button_presses = new_reserved_button_presses
+    
+    return get_status
+  end
 
   def setup_rooms
-    existing_rooms = Rooms.find(:all)
+    existing_rooms = Room.find(:all)
     
     params[:num_cols].to_i.times do |row|
       if row < existing_rooms.length # row already exists in the table
         room = existing_rooms[row]
         room.destroy and next if params["delete_#{row}"]
+        room.updated_at = Time.now
       else
         next if params["delete_#{row}"]
-        room = Rooms.new(:created_at => Time.now, :created_at => Time.now)
+        room = Room.new(:created_at => Time.now, :updated_at => Time.now)
       end
       
       room.calendar_name = params["text_c_name_#{row}"]
@@ -36,13 +58,12 @@ class RoomController < ApplicationController
   def dev_null
     render :nothing => true
   end
+  
+  private
 
-  # Returns the information to be displayed on the lcd screen and status lights
   def get_status
 
   end
-  
-  private
 
   # finds the calendar associated with the room number and adds an event of EVENT_LENGTH_INCREMENT to it
   # params:
@@ -107,3 +128,8 @@ end
 # t.integer  "room_number"
 # t.string   "current_meeting"
 # t.string   "next_meeting"
+
+
+current reservation
+next reservation
+name of the room
