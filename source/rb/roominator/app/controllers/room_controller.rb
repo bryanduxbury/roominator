@@ -48,7 +48,7 @@ class RoomController < ApplicationController
     current_room.reserved_button_presses = new_reserved_button_presses
     current_room.save!
     
-    redirect_to get_status
+    return get_status()
   end
   
   # checks the calendar associated with the room specified, if there is currently an event it extends it by
