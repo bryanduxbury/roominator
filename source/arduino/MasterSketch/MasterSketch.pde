@@ -1,15 +1,16 @@
 #include <Wire.h>
 
 void setup() {
-  Wire.begin();   
+  //Serial.begin(9600); //For debugging
+  Wire.begin();
 }
 
 void loop() {
   Wire.beginTransmission(1);
   Wire.send(0);
   Wire.send(5);
-  Wire.send("OREO");  
+  Wire.send("OREO");
   Wire.endTransmission();
-  delay(1000);
+  delay(100);
 }
 

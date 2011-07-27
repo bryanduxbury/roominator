@@ -7,6 +7,8 @@ class NetworkSlave {
     NetworkSlave();
     void parseData(int numBytes);
     char* getName();
+    //Remove this, for testing only!
+    void setName(char* name);
     void incrementReservePressed();
     void incrementCancelPressed();
   
@@ -17,6 +19,7 @@ class NetworkSlave {
     Reservation getNextReservation();
     
   private:
+    void parseName();
     char * name;
     int reserveCount;
     int cancelCount;

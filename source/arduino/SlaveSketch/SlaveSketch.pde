@@ -1,21 +1,27 @@
 #include <NetworkSlave.h>
 #include <Reservation.h>
 #include <Wire.h>
-#include <LiquidCrystal.h>
+#include <string.h>
+//#include <LiquidCrystal.h>
 
 NetworkSlave slave;
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+//LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 void setup() {
+  Serial.begin(9600);
   Wire.begin(1);
   Wire.onReceive(callback);
 }
 
 void loop() {
   delay(100);
-  lcd.setCursor(0,0);
-  lcd.print("Your Name is: ");
-  lcd.print(slave.getName());
+  Serial.print("My name is: ");
+  Serial.println(slave.getName());
+  Serial.print("My length is: ");
+  Serial.println(strlen(slave.getName()));
+//  lcd.setCursor(0,0);
+//  lcd.print("Your Name is: ");
+//  lcd.print(slave.getName());
 }
 
 void callback(int numBytes) {

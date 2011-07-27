@@ -14,23 +14,50 @@ NetworkSlave::NetworkSlave() {
 
 void NetworkSlave::parseData(int numBytes) {  
   //First byte will be 0 (hopefully)
-  if (Wire.receive() != 0)
-  {
-    return;  
-  }
-  
-  byte nameLength = Wire.receive();
+  int firstByte = (int)Wire.receive();
+    if (firstByte != 0)
+    {
+      Serial.print("Exiting, first byte was not 0");
+      return;
+    }
+    parseName();        
+    int nameLength = Wire.receive();
+    char name_data[nameLength];
+        
+    for(int i = 0; i < nameLength; i++)
+    {
+      name_data[i] = Wire.receive();
+    }
+    this->name = name_data;
+    while(Wire.available())
+    {
+      Serial.println("Should not enter this, miscalculated number of bytes in string");
+      Wire.receive();
+    }   
+}
+
+void parseName() {
+  int nameLength = Wire.receive();
   char name_data[nameLength];
-  
+      
   for(int i = 0; i < nameLength; i++)
   {
     name_data[i] = Wire.receive();
   }
-  this->name = name_data; 
+  
+  this->name = name_data;
+  
+  //Free the temp string we were using
+  free(name_data);
 }
 
 char* NetworkSlave::getName() {
   return name;
+}
+
+//Remove this!! for testing only
+void NetworkSlave::setName(char* name) {
+  this->name = name;
 }
 
 void NetworkSlave::incrementReservePressed() {
