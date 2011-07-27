@@ -1,23 +1,23 @@
 class RoomController < ApplicationController
-
+  
   before_filter :authenticate_to_gcal
   before_filter :set_current_event, :only => [:add_event, :extend_event, :room_free?, :vacate]
 
   EVENT_LENGTH_INCREMENT = 15.minutes
-
+  
   def index
     @rooms = Room.all
   end
-
+  
   def add_room
-
+    
   end
 
   # finds the calendar associated with the room number and adds an event of EVENT_LENGTH_INCREMENT to it
   # If there is already an event taking place, it extends that one instead
   # params:
   # room_number - the internal identifier of the room which is being booked
-  def add_event
+    def add_event
     if !@event
       @event = GCal4Ruby::Event.new(@service, {:calendar => @calendar,
                                               :title => "Roomination",
@@ -49,22 +49,51 @@ class RoomController < ApplicationController
     render :json => {:free => !@event}
   end
 
+
+  def room_free?
+    room = get_room(params[:room_number])
+    render :json => {:free => !!get_current_event(room)}
+  end
+  
   # gets the current event happening in this room and and changes its end time to right now
   def vacate
     @event.end_time = Time.now unless @event.nil?
     render :json => {:success => @event.save}
   end
 
+  def setup_rooms
+    existing_rooms = Rooms.find(:all)
+    
+    params[:num_cols].to_i.times do |row|
+      if row < existing_rooms.length # row already exists in the table
+        room = existing_rooms[row]
+        room.destroy and next if params["delete_#{row}"]
+      else
+        next if params["delete_#{row}"]
+        room = Rooms.new(:created_at => Time.now, :created_at => Time.now)
+      end
+      
+      room.calendar_name = params["text_c_name_#{row}"]
+      room.calendar_id   = params["text_c_id_#{row}"]
+      room.room_name     = params["text_r_name_#{row}"]
+      room.room_number   = params["text_r_number_#{row}"]
+      room.save!
+    end
+    
+    redirect_to :back
+  end
+  
   # this is a hack TODO clean this up
   # I redirect here if the any of the methods that require a room number are called without that parameter
   def dev_null
     render :nothing => true
   end
-
+  
   private
 
   def set_current_event
     @room = Room.find_by_room_number(params[:room_number]) rescue nil
+    debugger
     return redirect_to :controller => :room, :action => :dev_null if @room.nil? #trash the request if the room number was absent or bad
     @calendar = @service.calendars.select{|cal| cal.id == @room.calendar_id}.first #grab the calendar for this room
     events = @calendar.events
@@ -72,3 +101,12 @@ class RoomController < ApplicationController
     @event = events.first #there should only be one event at a time, if not we'll just ignore it
   end
 end
+
+# t.string   "calendar_name"
+# t.integer  "calendar_id"
+# t.string   "room_name"
+# t.datetime "created_at"
+# t.datetime "updated_at"
+# t.integer  "room_number"
+# t.string   "current_meeting"
+# t.string   "next_meeting"
