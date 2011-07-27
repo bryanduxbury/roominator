@@ -1,17 +1,20 @@
 #ifndef NetworkSlave_h
 #define NetworkSlave_h
 
+#include <UpstreamData.h>
+#include <DownstreamData.h>
+
 class NetworkSlave {
   public:
     NetworkSlave();
-    byte* getUpstreamData();
-    void processDownstreamData(byte *);
+    char* getUpstreamData();
+    void processDownstreamData(char*);
     void reserve();
     void cancel();
     char* getDisplayString();
   
   private:
-    UpstreamData *ud
+    UpstreamData *ud;
     DownstreamData *dd;
 };
 

@@ -2,46 +2,63 @@
 #include <LiquidCrystal.h>
 #include <NetworkSlave.h>
 #include <DisplayController.h>
-#include <Reservation.h>
 #include <BounceButton.h>
 #include <string.h>
 
 NetworkSlave slave;
-//DisplayController dc("name");
-//LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+DisplayController dc("name");
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
-//BounceButton reserve(2);
+BounceButton reserve(2);
 //BounceButton cancel(3);
+
+int check;
 
 
 void setup() {
-  //reserve.initialize();
-  //cancel.initialize();
+  lcd.begin(19, 4);
+  reserve.initialize();
+//  cancel.initialize();
   Serial.begin(9600);  
   Wire.begin(1);
-  Wire.onReceive(callback); 
+  Wire.onReceive(handleReceive);
+  Wire.onRequest(handleRequest); 
+  check = 0;
+  
 }
 
 void loop() {
   
   delay(100);
-  Serial.print("My name is: ");
-  Serial.println(slave.getName());
-  //lcd.setCursor(0,0);
-  //lcd.print("Your Name is: ");
-  //lcd.print(slave.getName());
+  lcd.setCursor(0,0);
+  lcd.print(slave.getDisplayString());
   
-//  if (reserve.check()) {
-//    slave.incrementReservePressed();
-//  }
-//  
+  if (reserve.check()) {
+    check++;
+    lcd.print(check);
+//    slave.reserve();
+  }
+  
 //  if (cancel.check()) {
-//    slave.incrementCancelPressed();
+//    slave.cancel();
 //  }
   
 }
 
-void callback(int numBytes) {
-  slave.parseData(numBytes); 
+void handleRequest() {
+  byte *packet = slave.getUpstreamData(); 
+  Wire.beginTransmission(); 
+  Wire.send(packet);
+  Wire.endTransmission();
+}
+
+void handleReceive(int numBytes) {
+  byte *packet[numBytes];
+  int i = 0;
+  while (1 < Wire.available()) {
+    byte[i] = Wire.receive();
+    i++;  
+  }
+  slave.processDownstreamData(packet);
 }
 
