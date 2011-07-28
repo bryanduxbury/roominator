@@ -5,6 +5,8 @@
 #include <BounceButton.h>
 #include <string.h>
 
+#define UPSTREAM_MESSAGE_SIZE 2
+
 NetworkSlave slave;
 DisplayController dc("name");
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
@@ -44,7 +46,11 @@ void loop() {
 }
 
 void handleRequest() {
-  Wire.send(slave.getUpstreamData());
+  int message* = slave.getUpstreamData();
+  
+  for (int i=0; i < UPSTREAM_MESSAGE_SIZE; i++) {
+    Wire.send(message[i]);
+  }
 }
 
 void handleReceive(int numBytes) {
