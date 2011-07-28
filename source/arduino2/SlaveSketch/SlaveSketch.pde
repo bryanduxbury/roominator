@@ -21,7 +21,7 @@ void setup() {
   lcd.begin(19, 4);
   reserve.initialize();
 //  cancel.initialize();
-  Serial.begin(9600);  
+  //Serial.begin(9600);  
   Wire.begin(1);
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest); 

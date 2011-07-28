@@ -16,9 +16,9 @@ NetworkSlave::NetworkSlave() {
 char* NetworkSlave::getUpstreamData() {
   char message[UPSTREAM_MESSAGE_SIZE];
   char reserve[1];
-  message[0] = (char) ud.getCancel();
-  sprintf(reserve, "%u", ud.getReserve());
-  message[1] = (char) reserve;
+  message[0] = (char) ud->getCancel();
+  sprintf(reserve, "%u", ud->getReserve());
+  message[1] = (char) reserve[0];
   free(reserve);
   return message;
 }
