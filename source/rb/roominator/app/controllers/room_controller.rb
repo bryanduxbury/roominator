@@ -16,10 +16,10 @@ class RoomController < ApplicationController
   # gives slave id, reserved_button_presses, cancel_button_presses
   # returns current information
   def report
-    @room_number                = params[:room_number].to_i
+    @room_number                = params[:id].to_i
     current_room                = Room.find_by_room_number(@room_number)
-    new_reserved_button_presses = params[:reserved_button_presses].to_i
-    new_cancel_button_presses   = params[:cancel_button_presses].to_i
+    new_reserved_button_presses = params[:rsv].to_i
+    new_cancel_button_presses   = params[:cancel].to_i
     
     delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
