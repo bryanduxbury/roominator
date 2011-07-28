@@ -12,14 +12,14 @@ NetworkSlave::NetworkSlave() {
   dd.setDisplayString(NULL);
 }
 
-byte* NetworkSlave::getUpstreamData() {
-  byte message[UPSTREAM_MESSAGE_SIZE];
-  message[0] = (byte) ud.getCancel();
-  message[1] = (byte) ud.getReserve();
+char* NetworkSlave::getUpstreamData() {
+  char message[UPSTREAM_MESSAGE_SIZE];
+  message[0] = (char) ud.getCancel();
+  message[1] = (char) ud.getReserve();
   return &message;
 }
 
-void NetworkSlave::setDownstreamData(byte *received) {
+void NetworkSlave::setDownstreamData(char *received) {
   dd = DownstreamDataParser::parseDownstreamData(received);
 }
 

@@ -2,5 +2,5 @@
 
 class Reservations {
   public:
-    static DownstreamData* parseDownstreamData(byte *received);
+    static DownstreamData* parseDownstreamData(char *received);
 };

@@ -2,7 +2,7 @@
 
 #define VALID 0
 
-DownstreamDataParser::DownstreamData* parseDownstreamData(byte *received) {
+DownstreamDataParser::DownstreamData* parseDownstreamData(char *received) {
   DownstreamData *dd;
   
   if (((int) dd[0]) != VALID) {
