@@ -8,7 +8,7 @@
       create_new_row(<%= "
         #{room.room_number},
         '#{CGI::escapeHTML(room.room_name.gsub("\\","\\\\\\\\"))}',
-        #{room.calendar_id},
+        '#{CGI::escapeHTML(room.calendar_id)}',
         '#{CGI::escapeHTML(room.calendar_name.gsub("\\","\\\\\\\\"))}'
         " %>);
     <% end %>
