@@ -12,6 +12,8 @@ class NetworkSlave {
     void cancel();
     int getReserve();
     int getCancel();
+    bool getCurrentReservation();
+    bool getPendingReservation();
     char* getDisplayString();
   
   private:

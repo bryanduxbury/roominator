@@ -11,17 +11,17 @@ DownstreamData DownstreamDataParser::parseDownstreamData(char *received) {
   }
   
   switch ((int) received[1]) {
-    case 0:
+    case 0: // RED
     dd.setCurrentReservation(true);
     dd.setPendingReservation(false);
     break;
     
-    case 1:
+    case 1: // YELLOW
     dd.setCurrentReservation(false);
     dd.setPendingReservation(true);
     break;
     
-    case 2:
+    case 2: // GREEN
     dd.setCurrentReservation(false);
     dd.setPendingReservation(false);
   }
@@ -29,7 +29,7 @@ DownstreamData DownstreamDataParser::parseDownstreamData(char *received) {
   int stringLength = received[2];
   char displayString[stringLength];
   for (int i=0; i<stringLength; i++) {
-    displayString[i] = (char) received[i+3]; 
+    displayString[i] = (char) received[i+3];
   }
   dd.setDisplayString(displayString);
   
