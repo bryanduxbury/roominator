@@ -10,13 +10,13 @@ DisplayController dc("name");
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 BounceButton reserve(2);
-//BounceButton cancel(3);
+BounceButton cancel(6);
 
 void setup() {
   lcd.begin(19, 4);
   
   reserve.initialize();
-//  cancel.initialize();
+  cancel.initialize();
   
   Serial.begin(9600);
   Wire.begin(1);
@@ -25,23 +25,44 @@ void setup() {
 }
 
 void loop() {
-  delay(100);
+  delay(50);
   
   lcd.setCursor(0,0);
   lcd.print(slave.getDisplayString());
   
   if (reserve.check()) {
     slave.reserve();
+    Serial.print("Cancel:");
+    Serial.println(slave.getCancel());
+    Serial.print("Reserve:");
+    Serial.println(slave.getReserve());
   }
   
-  Serial.println(slave.getCancel());
-  Serial.println(slave.getReserve());
+  if (cancel.check()) {
+    slave.cancel();
+    Serial.print("Cancel:");
+    Serial.println(slave.getCancel());
+    Serial.print("Reserve:");
+    Serial.println(slave.getReserve());
+  }
   
+  Serial.println((slave.getCancel()) ? 0xFF : slave.getReserve());
 }
 
 void handleRequest() {
-  Wire.send(slave.getCancel());
-  Wire.send(slave.getReserve());
+  handleEncodedIntegerRequest();
+//  handleCharArrayRequest();
+}
+
+void handleEncodedIntegerRequest() {
+  Wire.send((slave.getCancel()) ? 0xF : slave.getReserve()); 
+}
+
+void handleCharArrayRequest() {
+  char message[2];
+  message[0] = (char) slave.getCancel();
+  message[1] = (char) slave.getReserve();
+  Wire.send(message);
 }
 
 void handleReceive(int numBytes) {
