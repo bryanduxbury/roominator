@@ -1,3 +1,6 @@
+#ifndef DownstreamData_h
+#define DownstreamData_h
+
 class DownstreamData {
   public:
     bool getCurrentReservation();
@@ -5,10 +8,12 @@ class DownstreamData {
     bool getPendingReservation();
     void setPendingReservation(bool value);
     char* getDisplayString();
-    void setDisplayString(char *value);
+    void setDisplayString(char value[]);
     
   private:
     bool currentReservation;
     bool pendingReservation;
-    char *displayString;
-}
+    char displayString[80];
+};
+
+#endif

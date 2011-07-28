@@ -1,3 +1,6 @@
+#ifndef UpstreamData_h
+#define UpstreamData_h
+
 class UpstreamData {
   public:
     void setReserve(int value);
@@ -8,4 +11,6 @@ class UpstreamData {
   private:
     int reserve;
     bool cancel;
-}
+};
+
+#endif

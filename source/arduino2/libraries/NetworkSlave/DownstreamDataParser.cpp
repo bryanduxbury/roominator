@@ -2,35 +2,35 @@
 
 #define VALID 0
 
-DownstreamDataParser::DownstreamData* parseDownstreamData(char *received) {
+DownstreamData* DownstreamDataParser::parseDownstreamData(char *received) {
   DownstreamData *dd;
   
-  if (((int) dd[0]) != VALID) {
+  if (((int) received[0]) != VALID) {
     // TODO
   }
   
-  switch (dd[1]) {
+  switch ((int) received[1]) {
     case 0:
-    dd.setCurrentReservation(true);
-    dd.setPendingReservation(NULL);
+    dd->setCurrentReservation(true);
+    dd->setPendingReservation(false);
     break;
     
     case 1:
-    dd.setCurrentReservation(false);
-    dd.setPendingReservation(true);
+    dd->setCurrentReservation(false);
+    dd->setPendingReservation(true);
     break;
     
     case 2:
-    dd.setCurrentReservation(false);
-    dd.setPendingReservation(false);
+    dd->setCurrentReservation(false);
+    dd->setPendingReservation(false);
   }
   
-  int stringLength = dd[2];
+  int stringLength = received[2];
   char displayString[stringLength];
   for (int i=0; i<stringLength; i++) {
     displayString[i] = (char) received[i+3]; 
   }
-  dd.setDisplayString(&displayString);
+  dd->setDisplayString(displayString);
   
   return dd;
 }

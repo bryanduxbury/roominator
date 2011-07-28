@@ -1,15 +1,17 @@
-UpstreamData::setReserve(int value) {
+#include <UpstreamData.h>
+
+void UpstreamData::setReserve(int value) {
   reserve = value;
 }
 
-UpstreamData::getReserve() {
+int UpstreamData::getReserve() {
   return reserve;
 }
 
-UpstreamData::setCancel(bool value) {
+void UpstreamData::setCancel(bool value) {
   cancel = value;
 }
 
-UpstreamData::getCancel() {
+bool UpstreamData::getCancel() {
   return cancel;
 }
