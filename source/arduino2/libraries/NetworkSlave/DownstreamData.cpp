@@ -1,6 +1,8 @@
 #include <DownstreamData.h>
 #include <string.h>
 
+DownstreamData::DownstreamData() {}
+
 bool DownstreamData::getCurrentReservation() {
   return currentReservation;
 }

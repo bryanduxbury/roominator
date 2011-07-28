@@ -7,15 +7,16 @@
 class NetworkSlave {
   public:
     NetworkSlave();
-    int* getUpstreamData();
     void setDownstreamData(char*);
     void reserve();
     void cancel();
+    int getReserve();
+    int getCancel();
     char* getDisplayString();
   
   private:
-    UpstreamData *ud;
-    DownstreamData *dd;
+    UpstreamData ud;
+    DownstreamData dd;
 };
 
 #endif

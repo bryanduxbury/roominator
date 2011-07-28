@@ -5,7 +5,7 @@
 
 class DownstreamDataParser {
   public:
-    static DownstreamData* parseDownstreamData(char *received);
+    static DownstreamData parseDownstreamData(char *received);
 };
 
 #endif

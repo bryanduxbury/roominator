@@ -3,6 +3,7 @@
 
 class UpstreamData {
   public:
+    UpstreamData();
     void setReserve(int value);
     int getReserve();  
     void setCancel(bool value);
