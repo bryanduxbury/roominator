@@ -23,7 +23,7 @@ void setup()
   Serial.begin(9600);  //For debugging, take out eventually
   Wire.begin(); //join bus as master
   Ethernet.begin(mac, ip, gateway, subnet);
-  delay(1000);   
+  delay(1000);  
 }
 
 void loop()
@@ -35,8 +35,11 @@ void loop()
   //Loop over addresses 1 thru 9
   for(int i = 1; i < 9; i++)
   {
-    Wire.requestFrom(i,1); //request 2 bytes from slave
-    if(Wire.available()) //if the slave is responsive
+    Serial.println("Before request");
+    Serial.print(i);
+    Wire.requestFrom(i, 1); //request 1 bytes from slave
+    Serial.println("After request");
+    if (Wire.available()) //if the slave is responsive
     {  
       Serial.print("Got data from slave: ");
       Serial.println(i);  

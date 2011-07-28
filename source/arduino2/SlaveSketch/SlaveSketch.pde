@@ -18,7 +18,7 @@ void setup() {
   reserve.initialize();
   cancel.initialize();
   
-  Serial.begin(9600);
+  //Serial.begin(9600);
   Wire.begin(1);
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
@@ -51,12 +51,17 @@ void loop() {
 }
 
 void handleRequest() {
+  Serial.println("In handle request");
   handleEncodedIntegerRequest();
 //  handleCharArrayRequest();
 }
 
 void handleEncodedIntegerRequest() {
-  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve()); 
+  Serial.println("In encoded int before send");
+  Serial.println((slave.getCancel()) ? 0xFF : slave.getReserve());
+//  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
+  Wire.send('a');
+  Serial.println("In encoded int after send");
 }
 
 void handleCharArrayRequest() {
