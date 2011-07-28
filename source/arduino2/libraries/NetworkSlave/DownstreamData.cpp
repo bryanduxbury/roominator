@@ -1,3 +1,6 @@
+#include <DownstreamData.h>
+#include <string.h>
+
 bool DownstreamData::getCurrentReservation() {
   return currentReservation;
 }
@@ -18,6 +21,6 @@ char* DownstreamData::getDisplayString() {
   return displayString;
 }
 
-void setDisplayString(char *value) {
+void DownstreamData::setDisplayString(char *value) {
   strcpy(displayString, value);
 }
