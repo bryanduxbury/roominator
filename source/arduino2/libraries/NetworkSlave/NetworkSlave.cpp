@@ -9,7 +9,7 @@ NetworkSlave::NetworkSlave() {
   ud.setReserve(0);
   
   dd = DownstreamData();
-  dd.setCurrentReservation(false);
+  dd.setCurrentReservation(true);
   dd.setPendingReservation(false);
   dd.setDisplayString(NULL);
 }
