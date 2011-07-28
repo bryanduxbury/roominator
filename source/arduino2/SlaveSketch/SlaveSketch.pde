@@ -46,7 +46,7 @@ void loop() {
 }
 
 void handleRequest() {
-  int message* = slave.getUpstreamData();
+  int* message = slave.getUpstreamData();
   
   for (int i=0; i < UPSTREAM_MESSAGE_SIZE; i++) {
     Wire.send(message[i]);

@@ -9,8 +9,8 @@
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //mac address of master arduino
 byte ip[] = { 10, 99, 33, 128 }; //IP address of arduino
-byte gateway[] = { 10, 99, 33, 254 };
-byte subnet[] = { 255, 255, 254, 0 };
+byte gateway[] = { 10, 99, 33, 254 }; //IP address of router in office
+byte subnet[] = { 255, 255, 254, 0 }; //subnet mask of office network
 
 byte server[] = {10, 99, 32, 130 }; //My comp
 
@@ -20,106 +20,88 @@ Client client(server, 3000);
 
 void setup()
 {
-  Wire.begin();
+  Serial.begin(9600);  //For debugging, take out eventually
+  Wire.begin(); //join bus as master
   Ethernet.begin(mac, ip, gateway, subnet);
-  Serial.begin(9600); 
-  delay(1000);
+  delay(1000);   
 }
 
 void loop()
 {
-  Wire.requestFrom(1,2); //request 2 bytes from slave 1
-  int cancel = Wire.receive();
-  Serial.print("Cancel byte is: ");
-  Serial.println(cancel);
-  int reserveCount = Wire.receive();
-  
-  Serial.print("rsv byte is: ");
-  Serial.println(reserveCount);
-  
-  if (client.connect()) 
+  //Loop over addresses 1 thru 9
+  for(int i = 1; i < 9; i++)
   {
-    Serial.println("connected");
-    client.println(generatePostRequest(1, reserveCount, cancel));
-    client.println();
-  } 
-  else
-  {
-    Serial.println("connection failed");
-  }
+    Wire.requestFrom(i,2); //request 2 bytes from slave
+    if(Wire.available()) //if the slave is responsive
+    {  
+      Serial.print("Got data from slave: ");
+      Serial.println(i);  
+      int cancel = Wire.receive();
+      Serial.print("Cancel byte is: ");
+      Serial.println(cancel);
+      int reserveCount = Wire.receive();
+      
+      Serial.print("rsv byte is: ");
+      Serial.println(reserveCount);
+      
+      char* message = (char*) malloc(100);
+      generatePostRequest(1, reserveCount, cancel, message);
+      Serial.print("Message to server is: ");
+      Serial.println(message);
+ 
+      while(!client.connect())
+      {
+        Serial.println("Could not connect, trying again");
+      }
+      Serial.println("Connected");
+      //Send request
+      client.println(message);
+      client.println();
+      free(message);
+      
+      while(!client.available())
+      {
+        Serial.println("server response not available yet");
+        //nop
+      }
   
-  while(!client.available())
-  {
-    //nop
-  }
-  
-  while(client.available())
-  {
-      char c = client.read();
-      Serial.print(c);  
+      while(client.available())
+      {
+        char c = client.read();
+        Serial.print(c);  
+      }
+      
+      client.stop();
+      Serial.println("Disconnected from server");
+      
+    }
+    else
+    {
+      Serial.print("Slave was not responsive: ");
+      Serial.println(i);
+    }
   }
 }
 
-//void setup()
-//{
-//  Ethernet.begin(mac, ip, gateway, subnet);
-//  Serial.begin(9600);
-//
-//  delay(1000);
-//
-//  Serial.println("connecting...");
-//  
-//  if (client.connect()) 
-//  {
-//    Serial.println("connected");
-//    Serial.print("String generated from function is: ");
-//    Serial.println(generatePostRequest(1,2,3));
-//    client.println(generatePostRequest(1,2,3));
-//    client.println();
-//  } 
-//  else
-//  {
-//    Serial.println("connection failed");
-//  }
-//}
-//
-//void loop()
-//{
-//  if (client.available()) {
-//    char c = client.read();
-//    Serial.print(c);
-//  }
-//
-//  if (!client.connected()) 
-//  {
-//    Serial.println();
-//    Serial.println("disconnecting.");
-//    client.stop();
-//    for(;;)
-//      ;
-//  }
-//}
-
-char* generatePostRequest(int id, int reservationCount, int cancelCount)
+void generatePostRequest(int id, int reservationCount, int cancelCount, char* message)
 {
-  char string[100];
-  char temp[100];
+  char temp[5];
   
-  strcpy(string, "GET /room/report?id=");
+  strcpy(message, "GET /room/report?id=");
   sprintf(temp, "%u", id);
-  strcat(string, temp); 
+  strcat(message, temp); 
   
-  strcat(string, "&rsv=");
+  strcat(message, "&rsv=");
   sprintf(temp, "%u", reservationCount);
-  strcat(string, temp);
+  strcat(message, temp);
 
-  strcat(string, "&cancel=");  
+  strcat(message, "&cancel=");
   sprintf(temp, "%u", cancelCount);
-  strcat(string, temp);
+  strcat(message, temp);
   
-  strcat(string, " HTTP/1.0");
+  strcat(message, " HTTP/1.0");
   
-  free(temp);
-  return string;
+  Serial.print("String returned from generate(while in func): ");
+  Serial.println(message);  
 }
 
