@@ -30,7 +30,8 @@ DownstreamData* DownstreamDataParser::parseDownstreamData(char *received) {
   for (int i=0; i<stringLength; i++) {
     displayString[i] = (char) received[i+3]; 
   }
-  dd->setDisplayString(displayString);
+  dd.setDisplayString(displayString);
+  free(displayString);
   
   return dd;
 }
