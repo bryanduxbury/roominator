@@ -20,8 +20,6 @@ void BounceButton::initialize() {
 
 bool BounceButton::check() {
 	int reading = digitalRead(pin);
-	digitalWrite(4, reading);
-	digitalWrite(3, currentState);
 	
 	//If the switch changed, due to noise or pressing:
 	if (reading != lastState) {

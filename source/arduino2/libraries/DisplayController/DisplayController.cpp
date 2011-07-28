@@ -11,12 +11,6 @@ using namespace std;
 #define YELLOW 1
 #define GREEN 0
 
-void DisplayController::setHigh(DisplayColor displayColor) {
-  digitalWrite(RED_PIN, (displayColor == RED) ? HIGH : LOW);
-  digitalWrite(YELLOW_PIN, (displayColor == YELLOW) ? HIGH : LOW);
-  digitalWrite(GREEN_PIN, (displayColor == GREEN) ? HIGH : LOW);
-}
-
 DisplayController::DisplayController(char displayName[]) {
   strcpy(displayName, _displayName);
   pinMode(RED_PIN, OUTPUT);
@@ -24,16 +18,14 @@ DisplayController::DisplayController(char displayName[]) {
   pinMode(GREEN_PIN, OUTPUT);
 }
 
+void DisplayController::setHigh(DisplayColor displayColor) {
+  digitalWrite(RED_PIN, (displayColor == RED) ? HIGH : LOW);
+  digitalWrite(YELLOW_PIN, (displayColor == YELLOW) ? HIGH : LOW);
+  digitalWrite(GREEN_PIN, (displayColor == GREEN) ? HIGH : LOW);
+}
+
 void DisplayController::setDisplayColor(DisplayColor displayColor) {
   _displayColor = displayColor;
   setHigh(displayColor);
-}
-
-void DisplayController::onPressReserveOrExtend() {
-  // TODO 
-}
-
-void DisplayController::onPressCancel() {
-  // TODO
 }
 

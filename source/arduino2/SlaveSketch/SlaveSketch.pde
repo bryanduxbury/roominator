@@ -6,7 +6,7 @@
 #include <string.h>
 
 NetworkSlave slave;
-DisplayController dc("name");
+DisplayController dc("Waiting");
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 BounceButton reserve(2);
@@ -21,32 +21,33 @@ void setup() {
   Serial.begin(9600);
   Wire.begin(1);
   Wire.onReceive(handleReceive);
-  Wire.onRequest(handleRequest); 
+  Wire.onRequest(handleRequest);
+  
+  lcd.setCursor(0,0);
+  lcd.print(slave.getDisplayString());
+  
+  DisplayColor color;
+  if (slave.getCurrentReservation()) {
+    color = RED;
+  } else if (slave.getPendingReservation()) {
+    color = YELLOW;
+  } else {
+    color = GREEN;
+  }
+  
+  dc.setDisplayColor(color);
 }
 
 void loop() {
   delay(50);
   
-  lcd.setCursor(0,0);
-  lcd.print(slave.getDisplayString());
-  
   if (reserve.check()) {
     slave.reserve();
-    Serial.print("Cancel:");
-    Serial.println(slave.getCancel());
-    Serial.print("Reserve:");
-    Serial.println(slave.getReserve());
   }
   
   if (cancel.check()) {
     slave.cancel();
-    Serial.print("Cancel:");
-    Serial.println(slave.getCancel());
-    Serial.print("Reserve:");
-    Serial.println(slave.getReserve());
   }
-  
-  Serial.println((slave.getCancel()) ? 0xFF : slave.getReserve());
 }
 
 void handleRequest() {
@@ -55,7 +56,7 @@ void handleRequest() {
 }
 
 void handleEncodedIntegerRequest() {
-  Wire.send((slave.getCancel()) ? 0xF : slave.getReserve()); 
+  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve()); 
 }
 
 void handleCharArrayRequest() {
@@ -69,8 +70,23 @@ void handleReceive(int numBytes) {
   char packet[numBytes];
   
   for (int i=0; 1 < Wire.available(); i++) {
-    packet[i] = (char) Wire.receive();
+    packet[i] = Wire.receive();
   }
   
   slave.setDownstreamData(packet);
+  
+  lcd.setCursor(0,0);
+  lcd.print(slave.getDisplayString());
+  
+  DisplayColor color;
+  if (slave.getCurrentReservation()) {
+    color = RED;
+  } else if (slave.getPendingReservation()) {
+    color = YELLOW;
+  } else {
+    color = GREEN;
+  }
+  
+  dc.setDisplayColor(color);
 }
+
