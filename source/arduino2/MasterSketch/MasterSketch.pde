@@ -36,11 +36,12 @@ void loop()
     {  
       Serial.print("Got data from slave: ");
       Serial.println(i);  
-      int cancel = Wire.receive();
+      int cancel = (int) Wire.receive();           
+      
       Serial.print("Cancel byte is: ");
       Serial.println(cancel);
-      int reserveCount = Wire.receive();
       
+      int reserveCount = (int) Wire.receive();      
       Serial.print("rsv byte is: ");
       Serial.println(reserveCount);
       
@@ -64,13 +65,12 @@ void loop()
         Serial.println("server response not available yet");
         //nop
       }
-  
-      while(client.available())
-      {
-        char c = client.read();
-        Serial.print(c);  
-      }
-      
+ 
+      char* response = (char*) malloc(500);
+      parseHttpResponse(response);
+      sendDownstreamPacket(i, response);
+      free(response);
+
       client.stop();
       Serial.println("Disconnected from server");
       
@@ -82,6 +82,52 @@ void loop()
     }
   }
 }
+
+
+void sendDownstreamPacket(int id, char* message)
+{
+  Serial.print("In send Downstream packet, the packet I would have sent is: ");
+  Serial.print(message);
+  Serial.print(" to id:");
+  Serial.println(id);
+}
+
+//Parses http response and stores downstreampacket in message
+void parseHttpResponse(char* message)
+{
+  throwAwayHeader();
+  message[0] = (char) 0;
+  int count = 1;
+  while(client.available())
+  {
+    char c = client.read();
+    //Got ending char
+    if(((int) c) == 200)
+    {
+      Serial.println("Got the second 200 integer from the websever, message is now done");
+      client.flush();
+      return;
+    }
+    message[count] = c;
+    count++;
+  }
+}
+
+void throwAwayHeader()
+{
+  while(client.available())
+ {
+   int c = (int) client.read();
+   if(c == 200) 
+   {
+     //Return with next digit to be the message
+     Serial.println("Got the 200 integer from the webserver");
+     return;  
+   }
+ } 
+}
+
+
 
 void generatePostRequest(int id, int reservationCount, int cancelCount, char* message)
 {
