@@ -1,6 +1,7 @@
 class Room < ActiveRecord::Base
 
   EVENT_LENGTH_INCREMENT = 15.minutes
+  REFRESH_PERIOD = 30.seconds.to_i
   STATUS_MEETING_NOW = 2
   STATUS_MEETING_SOON = 1
   STATUS_NO_MEETING = 0
@@ -54,6 +55,7 @@ class Room < ActiveRecord::Base
     next_events = events.select{|e| e.start_time > Time.now}
     @next_event = next_events.sort_by{|e| e.start_time}.first
     self.next_event = event_to_hash(@next_event)
+    self.last_refresh = Time.now.to_i
   end
 
   # returns false if there is currently an event happening on the calendar associated with params(:room_number) room
@@ -77,6 +79,12 @@ class Room < ActiveRecord::Base
 
     #other info? check with bri/yan
     return {:status => status, :room_name => self.calendar_name, :occupied_until => occupied_until, :occupied_next => occupied_next}
+  end
+
+  def refresh_cache(service)
+    if self.last_refresh + REFRESH_PERIOD < Time.now.to_i
+      set_instance_variables(service)
+    end
   end
 
   def event_to_hash(event)

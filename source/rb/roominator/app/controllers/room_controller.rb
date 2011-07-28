@@ -11,28 +11,41 @@ class RoomController < ApplicationController
   # gives slave id, reserved_button_presses, cancel_button_presses
   # returns current information
   def report
-    room_number                = params[:room_number].to_i
+    room_number                = params[:id].to_i
     current_room                = Room.find_by_room_number(room_number)
-    new_reserved_button_presses = params[:reserved_button_presses].to_i
-    new_cancel_button_presses   = params[:cancel_button_presses].to_i
+    new_reserved_button_presses = params[:rsv].to_i
+    new_cancel_button_presses   = params[:cancel].to_i
     
     delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
 
     if delta_cancel_button_presses > 0
-      current_room.cancel
+      #Thread.new{current_room.cancel(@service)}.run
+    elsif delta_reserved_button_presses > 0
+      Thread.new{current_room.add_or_extend(@service, delta_reserved_button_presses)}.run
     else
-      current_room.add_or_extend(@service, delta_reserved_button_presses) if delta_reserved_button_presses > 0
+      Thread.new{current_room.refresh_cache(@service)}.run
     end
     
     current_room.reserved_button_presses = new_reserved_button_presses
-    current_room.reserved_button_presses = new_reserved_button_presses
-    
-    render :json => current_room.get_status
+    current_room.cancel_button_presses = new_cancel_button_presses
+    current_room.save!
+
+    response_data = current_room.get_status
+
+    msg = response_data[:notice] || "hello"
+    header = [ 200, # zero
+                response_data[:status], # light
+                msg.length]
+    tail = [ 200 ]
+    header_in_binary = header.pack("C" * header.length) # "C" specifies: 8-bit unsigned
+    tail_in_binary = tail.pack("C" * tail.length)
+    data = header_in_binary + msg + tail_in_binary
+    render :text => data
   end
 
   def setup_rooms
-    existing_rooms = Room.find(:all)
+    existing_rooms = Room.all
     
     params[:num_cols].to_i.times do |row|
       if row < existing_rooms.length # row already exists in the table

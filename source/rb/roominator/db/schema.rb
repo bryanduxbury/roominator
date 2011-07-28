@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110727214450) do
+ActiveRecord::Schema.define(:version => 20110728185437) do
 
   create_table "rooms", :force => true do |t|
     t.string   "calendar_name"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(:version => 20110727214450) do
     t.text     "current_event"
     t.text     "next_event"
     t.text     "calendar"
+    t.integer  "last_refresh"
   end
 
 end
