@@ -23,17 +23,24 @@ class RoomController < ApplicationController
     
     delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
-
+    
     if delta_cancel_button_presses > 0
-      cancel
+      cancel()
     else
       add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
     end
     
     current_room.reserved_button_presses = new_reserved_button_presses
     current_room.reserved_button_presses = new_reserved_button_presses
+    current_room.save!
     
-    render :json => get_status
+    msg = "I really want to test something"
+    header = [ 0, # zero
+               1, # light
+               msg.length ] # length of msg
+    header_in_binary = header.pack("C" * header.length) # "C" specifies: 8-bit unsigned integer (unsigned char)
+    data = header_in_binary + msg
+    render :text => data
   end
 
   def setup_rooms
