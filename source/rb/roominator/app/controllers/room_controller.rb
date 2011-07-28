@@ -28,7 +28,7 @@ class RoomController < ApplicationController
     current_room.reserved_button_presses = new_reserved_button_presses
     current_room.reserved_button_presses = new_reserved_button_presses
     
-    render :json => get_status
+    render :json => current_room.get_status
   end
 
   def setup_rooms
