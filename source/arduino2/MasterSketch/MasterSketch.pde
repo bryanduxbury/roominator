@@ -65,22 +65,23 @@ void loop()
       {
         Serial.println("Could not connect, trying again");
       }
-      Serial.println("Connected");
+      Serial.println("Connected to server");
       //Send request
       client.println(message);
       client.println();
       free(message);
       
-      Serial.println("About to wait for server response");
+      Serial.println("Waiting for server response");
       while(!client.available())
       {
         //Serial.println("server response not available yet");
         //nop
       }
- 
+      
+      int lightNumber;
       char* response = (char*) malloc(500);
-      parseHttpResponse(response);
-      sendDownstreamPacket(i, response);
+      lightNumber = parseHttpResponse(response);
+      sendDownstreamPacket(i, lightNumber, response);
       free(response);
 
       client.stop();
@@ -95,19 +96,39 @@ void loop()
 }
 
 
-void sendDownstreamPacket(int id, char* message)
+void sendDownstreamPacket(int id, int lightNumber, char* message)
 {
-  //pack 0 first
-  Serial.print("In send Downstream packet, the packet I would have sent is: ");
-  Serial.print(message);
-  Serial.print(" to id:");
-  Serial.println(id);
+  
+//  Serial.print("Light number is: ");
+//  Serial.println(lightNumber);
+//  Serial.print("In send Downstream packet, the packet I would have sent is: ");
+//  Serial.print(message);
+//  Serial.print(" to id:");
+//  Serial.println(id);
+  
+//  char * string = (char*) malloc(3 + strlen(message));
+//  string[0] = (char) 0;
+//  string[1] = (char) lightNumber;
+//  string[2] = (char) strlen(message);
+//  strcat(string, message);
+  
+//  Serial.println(string);
+  
+  Wire.beginTransmission(id);
+  Wire.send((byte) 0);
+  Wire.send((byte) lightNumber);
+  Wire.send((byte) strlen(message));
+  Wire.send(message);
+  Wire.endTransmission();
+  
+//  free(string);
 }
 
 //Parses http response and stores downstreampacket in message
-void parseHttpResponse(char* message)
+int parseHttpResponse(char* message)
 {
   throwAwayHeader();
+  int lightNumber = (int) client.read();
   int count = 0;
   char c;
   byte b;
@@ -120,7 +141,7 @@ void parseHttpResponse(char* message)
     {
       message[count] = '\0';
       client.flush();
-      return;
+      return lightNumber;
     }
     message[count] = c;
     count++;
@@ -139,8 +160,6 @@ void throwAwayHeader()
    }
  } 
 }
-
-
 
 void generatePostRequest(int id, int reservationCount, int cancelCount, char* message)
 {
