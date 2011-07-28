@@ -1,19 +1,54 @@
 #include <string.h>
+
+#include <SPI.h>
 #include <Wire.h>
-#include <NetworkMaster.h>
+#include <Ethernet.h>
 
 
-NetworkMaster master;
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //mac address of master arduino
+byte ip[] = { 10, 99, 33, 128 }; //IP address of arduino
+byte gateway[] = { 10, 99, 33, 254 };
+byte subnet[] = { 255, 255, 254, 0 };
 
-void setup() {
-  master.setName("o hai");
+byte server[] = {10, 99, 32, 130 }; //My comp
+//byte server[] = { 72, 125, 93, 99 }; //Google.com
+
+Client client(server, 3000);
+
+void setup()
+{
+  Ethernet.begin(mac, ip, gateway, subnet);
+  Serial.begin(9600);
+
+  delay(1000);
+
+  Serial.println("connecting...");
   
-  //Serial.begin(9600); //For debugging
-  Wire.begin();
+  if (client.connect()) 
+  {
+    Serial.println("connected");
+    client.println("GET /search?q=arduino HTTP/1.0");
+    client.println();
+  } 
+  else
+  {
+    Serial.println("connection failed");
+  }
 }
 
-void loop() {
-  master.sendData(1);
-  delay(100);
+void loop()
+{
+  if (client.available()) {
+    char c = client.read();
+    Serial.print(c);
+  }
+
+  if (!client.connected()) {
+    Serial.println();
+    Serial.println("disconnecting.");
+    client.stop();
+    for(;;)
+      ;
+  }
 }
 
