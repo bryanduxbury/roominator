@@ -3,6 +3,7 @@
 
 class DownstreamData {
   public:
+    DownstreamData();
     bool getCurrentReservation();
     void setCurrentReservation(bool value);
     bool getPendingReservation();

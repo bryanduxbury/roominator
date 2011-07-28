@@ -1,5 +1,7 @@
 #include <UpstreamData.h>
 
+UpstreamData::UpstreamData() {}
+
 void UpstreamData::setReserve(int value) {
   reserve = value;
 }
