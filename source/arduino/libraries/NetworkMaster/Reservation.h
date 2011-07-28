@@ -4,7 +4,6 @@
 class Reservation {
   public:
     Reservation();
-  private:
     char* description;
     int seconds;
 };
