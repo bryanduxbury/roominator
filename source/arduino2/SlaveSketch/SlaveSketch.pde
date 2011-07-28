@@ -69,8 +69,12 @@ void handleCharArrayRequest() {
 void handleReceive(int numBytes) {
   char packet[numBytes];
   
-  for (int i=0; 1 < Wire.available(); i++) {
-    packet[i] = Wire.receive();
+  int numRead = 0;
+  while (numRead < numBytes) {
+    if (1 < Wire.available()) {
+      packet[numRead] = Wire.receive();
+      numRead++;
+    }
   }
   
   slave.setDownstreamData(packet);
