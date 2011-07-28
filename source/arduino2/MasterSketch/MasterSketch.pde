@@ -12,7 +12,7 @@ byte ip[] = { 10, 99, 33, 128 }; //IP address of arduino
 byte gateway[] = { 10, 99, 33, 254 }; //IP address of router in office
 byte subnet[] = { 255, 255, 254, 0 }; //subnet mask of office network
 
-byte server[] = {10, 99, 32, 130 }; //My comp
+byte server[] = {10, 99, 32, 39 }; //My comp
 
 int slaves[] = { 1 }; //Put addresses for slaves here
 
@@ -28,27 +28,38 @@ void setup()
 
 void loop()
 {
+  int payload;
+  int cancel;
+  int reserveCount;
+  
   //Loop over addresses 1 thru 9
   for(int i = 1; i < 9; i++)
   {
-    Wire.requestFrom(i,2); //request 2 bytes from slave
+    Wire.requestFrom(i,1); //request 2 bytes from slave
     if(Wire.available()) //if the slave is responsive
     {  
       Serial.print("Got data from slave: ");
       Serial.println(i);  
-      int cancel = (int) Wire.receive();           
+      payload = (int) Wire.receive();
+    
+      if (payload == 255)
+      {
+        cancel = 1;
+        reserveCount = 0;
+      }
+      else 
+      {
+        cancel = 0;
+        reserveCount = payload;
+      }      
       
-      Serial.print("Cancel byte is: ");
-      Serial.println(cancel);
-      
-      int reserveCount = (int) Wire.receive();      
-      Serial.print("rsv byte is: ");
-      Serial.println(reserveCount);
+//      Serial.print("Cancel byte is: ");
+//      Serial.println(cancel);
+//      Serial.print("rsv byte is: ");
+//      Serial.println(reserveCount);
       
       char* message = (char*) malloc(100);
       generatePostRequest(1, reserveCount, cancel, message);
-      Serial.print("Message to server is: ");
-      Serial.println(message);
  
       while(!client.connect())
       {
@@ -60,9 +71,10 @@ void loop()
       client.println();
       free(message);
       
+      Serial.println("About to wait for server response");
       while(!client.available())
       {
-        Serial.println("server response not available yet");
+        //Serial.println("server response not available yet");
         //nop
       }
  
@@ -73,7 +85,6 @@ void loop()
 
       client.stop();
       Serial.println("Disconnected from server");
-      
     }
     else
     {
@@ -86,6 +97,7 @@ void loop()
 
 void sendDownstreamPacket(int id, char* message)
 {
+  //pack 0 first
   Serial.print("In send Downstream packet, the packet I would have sent is: ");
   Serial.print(message);
   Serial.print(" to id:");
@@ -96,15 +108,17 @@ void sendDownstreamPacket(int id, char* message)
 void parseHttpResponse(char* message)
 {
   throwAwayHeader();
-  message[0] = (char) 0;
-  int count = 1;
+  int count = 0;
+  char c;
+  byte b;
   while(client.available())
   {
-    char c = client.read();
+    c = client.read();
+    b = (byte) c;
     //Got ending char
-    if(((int) c) == 200)
+    if(b == 200)
     {
-      Serial.println("Got the second 200 integer from the websever, message is now done");
+      message[count] = '\0';
       client.flush();
       return;
     }
@@ -117,11 +131,10 @@ void throwAwayHeader()
 {
   while(client.available())
  {
-   int c = (int) client.read();
+   byte c = (byte) client.read();
    if(c == 200) 
    {
      //Return with next digit to be the message
-     Serial.println("Got the 200 integer from the webserver");
      return;  
    }
  } 
@@ -146,8 +159,5 @@ void generatePostRequest(int id, int reservationCount, int cancelCount, char* me
   strcat(message, temp);
   
   strcat(message, " HTTP/1.0");
-  
-  Serial.print("String returned from generate(while in func): ");
-  Serial.println(message);  
 }
 
