@@ -3,8 +3,6 @@
 #include "Wire.h"
 #include "DownstreamDataParser.h"
 
-#define UPSTREAM_MESSAGE_SIZE 2
-
 NetworkSlave::NetworkSlave() {
   ud->setCancel(false);
   ud->setReserve(0);
@@ -13,13 +11,8 @@ NetworkSlave::NetworkSlave() {
   dd->setDisplayString(NULL);
 }
 
-char* NetworkSlave::getUpstreamData() {
-  char message[UPSTREAM_MESSAGE_SIZE];
-  char reserve[1];
-  message[0] = (char) ud->getCancel();
-  sprintf(reserve, "%u", ud->getReserve());
-  message[1] = (char) reserve[0];
-  free(reserve);
+int* NetworkSlave::getUpstreamData() {
+  int message[] = {ud->getCancel(), ud->getReserve()};
   return message;
 }
 

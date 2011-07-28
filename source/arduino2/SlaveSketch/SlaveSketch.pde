@@ -5,8 +5,6 @@
 #include <BounceButton.h>
 #include <string.h>
 
-#define MASTER_ADDRESS 10011
-
 NetworkSlave slave;
 DisplayController dc("name");
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
@@ -15,7 +13,6 @@ BounceButton reserve(2);
 //BounceButton cancel(3);
 
 int check;
-
 
 void setup() {
   lcd.begin(19, 4);
@@ -26,7 +23,6 @@ void setup() {
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest); 
   check = 0;
-  
 }
 
 void loop() {
@@ -48,17 +44,15 @@ void loop() {
 }
 
 void handleRequest() {
-  char *packet = slave.getUpstreamData(); 
-  Wire.send(packet);
+  Wire.send(slave.getUpstreamData());
 }
 
 void handleReceive(int numBytes) {
   char packet[numBytes];
-  int i = 0;
-  while (1 < Wire.available()) {
+  
+  for (int i=0; 1 < Wire.available(); i++) {
     packet[i] = (char) Wire.receive();
-    i++;
   }
+  
   slave.setDownstreamData(packet);
 }
-

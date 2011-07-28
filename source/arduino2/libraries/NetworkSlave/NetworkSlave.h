@@ -7,7 +7,7 @@
 class NetworkSlave {
   public:
     NetworkSlave();
-    char* getUpstreamData();
+    int* getUpstreamData();
     void setDownstreamData(char*);
     void reserve();
     void cancel();
