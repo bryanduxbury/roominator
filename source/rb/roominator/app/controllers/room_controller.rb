@@ -1,8 +1,8 @@
 class RoomController < ApplicationController
-  
-  before_filter :authenticate_to_gcal
 
   OVERFLOW_VALUE = 255
+
+  before_filter :start_worker_thread, :only => :report
 
   def index
     @rooms = Room.all
@@ -16,27 +16,29 @@ class RoomController < ApplicationController
     new_reserved_button_presses = params[:rsv].to_i
     new_cancel_button_presses   = params[:cancel].to_i
     
-    delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
-    delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
+    #delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
+    #delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
 
-    if delta_cancel_button_presses > 0
-      #Thread.new{current_room.cancel(@service)}.run
-    elsif delta_reserved_button_presses > 0
-      Thread.new{current_room.add_or_extend(@service, delta_reserved_button_presses)}.run
+    if new_cancel_button_presses > 0
+      #current_room.cancel
+      current_room.db_cancel
+    elsif new_reserved_button_presses > 0
+      #current_room.add_or_extend(new_reserved_button_presses)
+      current_room.db_add_or_extend(new_reserved_button_presses)
     else
-      Thread.new{current_room.refresh_cache(@service)}.run
+      current_room.refresh_cache
     end
     
-    current_room.reserved_button_presses = new_reserved_button_presses
-    current_room.cancel_button_presses = new_cancel_button_presses
-    current_room.save!
+    #current_room.reserved_button_presses = new_reserved_button_presses
+    #current_room.cancel_button_presses = new_cancel_button_presses
+    #current_room.save!
 
     response_data = current_room.get_status
 
-    msg = response_data[:notice] || "hello"
-    header = [ 200, # zero
-                response_data[:status], # light
-                msg.length]
+    msg = response_data[:notice] || "Server Error"
+    header = [200, # zero
+             response_data[:status] || 0] # light
+
     tail = [ 200 ]
     header_in_binary = header.pack("C" * header.length) # "C" specifies: 8-bit unsigned
     tail_in_binary = tail.pack("C" * tail.length)

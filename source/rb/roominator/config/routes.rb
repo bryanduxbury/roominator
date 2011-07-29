@@ -1,6 +1,7 @@
 Roominator::Application.routes.draw do
   root :to => "home#index"
   match 'rooms' => 'room#index'
+  match 'room/report' => 'room#report'
 
   # See how all your routes lay out with "rake routes"
   
