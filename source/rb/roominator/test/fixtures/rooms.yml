@@ -11,10 +11,13 @@ two:
   room_name: Thule
   room_number: 2
   calendar_id: gisman%40oberlin.edu
-
+  reserved_button_presses: 0
+  cancel_button_presses: 0
 
 three:
   calendar_name: "N America (p+proj)"
   room_name: "North America"
   room_number: 3
   calendar_id: gisman%40oberlin.edu
+  reserved_button_presses: 0
+  cancel_button_presses: 0

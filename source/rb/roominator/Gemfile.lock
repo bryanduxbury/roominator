@@ -36,6 +36,10 @@ GEM
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
       sass (~> 3.1)
+    daemons (1.1.0)
+    delayed_job (2.1.4)
+      activesupport (~> 3.0)
+      daemons
     erubis (2.6.6)
       abstract (>= 1.0.0)
     fssm (0.2.7)
@@ -92,6 +96,7 @@ PLATFORMS
 
 DEPENDENCIES
   compass
+  delayed_job
   gcal4ruby
   haml-rails
   rails (= 3.0.1)

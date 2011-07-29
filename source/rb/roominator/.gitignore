@@ -5,3 +5,4 @@ tmp/**/*
 public/stylesheets/*
 Gemfile.lock
 config/authentication.yml
+.idea

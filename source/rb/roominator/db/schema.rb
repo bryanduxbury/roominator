@@ -10,7 +10,22 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110727171533) do
+ActiveRecord::Schema.define(:version => 20110729003958) do
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "rooms", :force => true do |t|
     t.string   "calendar_name"
@@ -18,11 +33,13 @@ ActiveRecord::Schema.define(:version => 20110727171533) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "room_number"
-    t.string   "current_meeting"
-    t.string   "next_meeting"
     t.string   "calendar_id"
     t.integer  "reserved_button_presses"
     t.integer  "cancel_button_presses"
+    t.text     "current_event"
+    t.text     "next_event"
+    t.text     "calendar"
+    t.integer  "last_refresh"
   end
 
 end
