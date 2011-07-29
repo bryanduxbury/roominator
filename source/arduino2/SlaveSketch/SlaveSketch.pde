@@ -6,14 +6,20 @@
 #include <DisplayController.h>
 #include <BounceButton.h>
 #include <string.h>
+ 
+//Junior
+int fig[] = {2,3,4,5,6,7,8,9,10,11,12,1};
+
+//Senior 
+//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
 
 // [GreenPin, YellowPin, RedPin, ResPin, CancelPin, LCD1, LCD2, LCD3, LCD4, LCD5, LCD6, I2CAddress]
-byte fig[12];
+//byte fig[12];
 //configuration will now hold a 12 byte array of bytes
-for(int i =0; i < 12; i++)
-{
-  fig[i] = EEPROM.read(i);  
-}
+//for(int i = 0; i < 12; i++)
+//{
+//  fig[i] = fig[i);  
+//}
 
 NetworkSlave slave;
 DisplayController dc("Waiting", fig[2], fig[1], fig[0]);
@@ -24,6 +30,7 @@ BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
 
 void setup() {
+  
   lcd.begin(20, 4);
   
   reserve.initialize();
@@ -34,6 +41,7 @@ void setup() {
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
   
+  lcd.clear();
   lcd.setCursor(0,0);
   lcd.print(slave.getDisplayString());
   
