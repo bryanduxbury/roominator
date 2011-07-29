@@ -56,10 +56,10 @@ void loop()
         reserveCount = payload;
       }      
       
-//      Serial.print("Cancel byte is: ");
-//      Serial.println(cancel);
-//      Serial.print("rsv byte is: ");
-//      Serial.println(reserveCount);
+      Serial.print("Cancel byte is: ");
+      Serial.println(cancel);
+      Serial.print("rsv byte is: ");
+      Serial.println(reserveCount);
       
       char* message = (char*) malloc(100);
       generatePostRequest(1, reserveCount, cancel, message);
@@ -77,13 +77,11 @@ void loop()
       Serial.println("Waiting for server response");
       while(!client.available())
       {
-        //Serial.println("server response not available yet");
-        //nop
+        Serial.println("server response not available yet");
       }
       
-      int lightNumber;
       char* response = (char*) malloc(500);
-      lightNumber = parseHttpResponse(response);
+      int lightNumber = parseHttpResponse(response);
       sendDownstreamPacket(i, lightNumber, response);
       free(response);
 
@@ -102,29 +100,25 @@ void loop()
 void sendDownstreamPacket(int id, int lightNumber, char* message)
 {
   
-//  Serial.print("Light number is: ");
-//  Serial.println(lightNumber);
-//  Serial.print("In send Downstream packet, the packet I would have sent is: ");
-//  Serial.print(message);
-//  Serial.print(" to id:");
-//  Serial.println(id);
+  Serial.print("Light number is: ");
+  Serial.println(lightNumber);
+  Serial.print("In send Downstream packet, the packet I would have sent is: ");
+  Serial.print(message);
+  Serial.print(" to id:");
+  Serial.println(id);
   
-//  char * string = (char*) malloc(3 + strlen(message));
-//  string[0] = (char) 0;
-//  string[1] = (char) lightNumber;
-//  string[2] = (char) strlen(message);
-//  strcat(string, message);
+  char string[80];
+  string[0] = (char) lightNumber;
+  string[1] = (char) strlen(message);
+  strcat(string, message);
   
-//  Serial.println(string);
+  Serial.print("String: "); 
+  Serial.println(string);
   
   Wire.beginTransmission(id);
-  Wire.send((byte) 0);
-  Wire.send((byte) lightNumber);
-  Wire.send((byte) strlen(message));
-  Wire.send(message);
+  Wire.send(string);
   Wire.endTransmission();
-  
-//  free(string);
+
 }
 
 //Parses http response and stores downstreampacket in message

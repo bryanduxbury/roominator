@@ -10,7 +10,7 @@ DisplayController dc("Waiting");
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 BounceButton reserve(2);
-BounceButton cancel(6);
+BounceButton cancel(5);
 
 void setup() {
   lcd.begin(19, 4);
@@ -52,7 +52,8 @@ void loop() {
 
 void handleRequest() {
   Serial.println("In handle request");
-  handleEncodedIntegerRequest();
+//  handleEncodedIntegerRequest();
+  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
 //  handleCharArrayRequest();
 }
 
@@ -74,12 +75,8 @@ void handleCharArrayRequest() {
 void handleReceive(int numBytes) {
   char packet[numBytes];
   
-  int numRead = 0;
-  while (numRead < numBytes) {
-    if (1 < Wire.available()) {
-      packet[numRead] = Wire.receive();
-      numRead++;
-    }
+  for (int i=0; Wire.available(); i++) {
+    packet[i] = Wire.receive();
   }
   
   slave.setDownstreamData(packet);

@@ -25,7 +25,7 @@ class RoomController < ApplicationController
     delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
     
     if delta_cancel_button_presses > 0
-      cancel()
+      cancel
     else
       add_or_extend(delta_reserved_button_presses) if delta_reserved_button_presses > 0
     end

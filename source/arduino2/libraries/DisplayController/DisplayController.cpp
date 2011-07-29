@@ -4,9 +4,9 @@
 #include <DisplayController.h>
 using namespace std;
 
-#define RED_PIN 5
-#define YELLOW_PIN 4
-#define GREEN_PIN 3
+#define RED_PIN 13
+#define YELLOW_PIN 3
+#define GREEN_PIN 4
 #define RED 2
 #define YELLOW 1
 #define GREEN 0

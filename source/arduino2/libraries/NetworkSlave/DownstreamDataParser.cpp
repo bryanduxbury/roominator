@@ -6,11 +6,7 @@
 DownstreamData DownstreamDataParser::parseDownstreamData(char *received) {
   DownstreamData dd;
   
-  if (((int) received[0]) != VALID) {
-    // TODO
-  }
-  
-  switch ((int) received[1]) {
+  switch ((int) received[0]) {
     case 0: // RED
     dd.setCurrentReservation(true);
     dd.setPendingReservation(false);
@@ -26,10 +22,10 @@ DownstreamData DownstreamDataParser::parseDownstreamData(char *received) {
     dd.setPendingReservation(false);
   }
   
-  int stringLength = received[2];
+  int stringLength = received[1];
   char displayString[stringLength];
   for (int i=0; i<stringLength; i++) {
-    displayString[i] = (char) received[i+3];
+    displayString[i] = (char) received[i+2];
   }
   dd.setDisplayString(displayString);
   
