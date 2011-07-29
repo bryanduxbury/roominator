@@ -8,7 +8,7 @@
 #include <string.h>
  
 //Junior
-int fig[] = {2,3,4,5,6,7,8,9,10,11,12,1};
+int fig[] = {4,3,2,5,6,8,9,10,11,12,13,1};
 
 //Senior 
 //int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
@@ -30,7 +30,6 @@ BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
 
 void setup() {
-  
   lcd.begin(20, 4);
   
   reserve.initialize();
@@ -43,6 +42,15 @@ void setup() {
   
   lcd.clear();
   lcd.setCursor(0,0);
+  lcd.print("1234567890abcdefghij");
+  lcd.setCursor(0,1);
+  lcd.print("1234567890abcdefghij");
+  lcd.setCursor(0,2);
+  lcd.print("1234567890abcdefghij");
+  lcd.setCursor(0,3);
+  lcd.print("1234567890abcdefghij");
+  delay(2000);
+  lcd.clear();
   lcd.print(slave.getDisplayString());
   
   DisplayColor color;
