@@ -58,4 +58,3 @@ void NetworkSlave::clearCounts() {
   ud.setReserve(0);
   ud.setCancel(false);
 }
-}

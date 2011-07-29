@@ -33,7 +33,9 @@ void loop()
   //Loop over addresses 1 thru 9
   for(int i = 1; i < 9; i++)
   {
+    Serial.println("before");
     Wire.requestFrom(i, 1); //request 1 bytes from slave
+    Serial.println("after");
     if (Wire.available()) //if the slave is responsive
     {  
       Serial.print("Got response from slave: ");

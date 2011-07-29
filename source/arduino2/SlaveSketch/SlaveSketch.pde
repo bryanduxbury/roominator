@@ -8,10 +8,10 @@
 #include <string.h>
  
 //Junior
-int fig[] = {4,3,2,5,6,8,9,10,11,12,13,1};
+//int fig[] = {4,3,2,5,6,8,9,10,11,12,13,1};
 
 //Senior 
-//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
+int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
 
 // [GreenPin, YellowPin, RedPin, ResPin, CancelPin, LCD1, LCD2, LCD3, LCD4, LCD5, LCD6, I2CAddress]
 //byte fig[12];
@@ -66,6 +66,7 @@ void setup() {
 }
 
 void loop() { 
+  Serial.println("Wakaakakak");
   if (reserve.check()) {
     slave.reserve();
     if (slave.getCancel() || (slave.getReserve() != 0)) {
@@ -88,11 +89,13 @@ void loop() {
 }
 
 void handleRequest() {
+  Serial.println("in request");
   Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
   slave.clearCounts();
 }
 
 void handleReceive(int numBytes) {
+    Serial.println("in receive");
   //If counts have incremented after we sent count, but before we were able to set the data
   if (!(slave.getCancel() || slave.getReserve()))
     {
