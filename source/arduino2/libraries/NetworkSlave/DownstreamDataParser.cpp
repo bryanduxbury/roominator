@@ -26,6 +26,7 @@ void DownstreamDataParser::parseAndUpdateDownstreamData(char* received, Downstre
   char displayString[stringLength];
   
   for (int i=0; i<stringLength; i++) {
+    Serial.println((byte) received[i+2]);
     displayString[i] = (char) received[i+2];
   }
   displayString[stringLength] = '\0';

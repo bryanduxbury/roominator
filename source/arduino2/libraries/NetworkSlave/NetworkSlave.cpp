@@ -38,6 +38,10 @@ void NetworkSlave::cancel() {
   }
 }
 
+void NetworkSlave::setDisplayString(char *displayString) {
+  dd.setDisplayString(displayString);
+}
+
 char* NetworkSlave::getDisplayString() {
 	return dd.getDisplayString();
 }

@@ -32,7 +32,6 @@ void loop()
   int cancel;
   int reserveCount;
   
-  delay(1000);
   //Loop over addresses 1 thru 9
   for(int i = 1; i < 9; i++)
   {
@@ -94,7 +93,7 @@ void loop()
 void sendDownstreamPacket(int id, int lightNumber, char* message)
 {  
   //Construct a one payload message.
-  char temp[80];
+  char temp[83];
   temp[0] = (char) lightNumber;
   temp[1] = (char) strlen(message);
   for (int i = 0; i < strlen(message); i++)
