@@ -35,16 +35,12 @@ void loop()
   //Loop over addresses 1 thru 9
   for(int i = 1; i < 9; i++)
   {
-    Serial.println("Before request");
-    Serial.print(i);
     Wire.requestFrom(i, 1); //request 1 bytes from slave
-    Serial.println("After request");
     if (Wire.available()) //if the slave is responsive
     {  
-      Serial.print("Got data from slave: ");
-      Serial.println(i);  
-      payload = (int) Wire.receive();
-    
+      Serial.print("Got response from slave: ");
+      Serial.println(i);
+      payload = (int) Wire.receive();    
       if (payload == 255)
       {
         cancel = 1;
@@ -55,20 +51,15 @@ void loop()
         cancel = 0;
         reserveCount = payload;
       }      
-      
-      Serial.print("Cancel byte is: ");
-      Serial.println(cancel);
-      Serial.print("rsv byte is: ");
-      Serial.println(reserveCount);
-      
+            
       char* message = (char*) malloc(100);
-      generatePostRequest(1, reserveCount, cancel, message);
+      generatePostRequest(i, reserveCount, cancel, message);
  
       while(!client.connect())
       {
         Serial.println("Could not connect, trying again");
       }
-      Serial.println("Connected to server");
+      Serial.println("Connected to server, sending request");
       //Send request
       client.println(message);
       client.println();
@@ -77,8 +68,10 @@ void loop()
       Serial.println("Waiting for server response");
       while(!client.available())
       {
-        Serial.println("server response not available yet");
+        //nop
       }
+      
+      Serial.println("Got response from server");
       
       char* response = (char*) malloc(500);
       int lightNumber = parseHttpResponse(response);
@@ -98,27 +91,17 @@ void loop()
 
 
 void sendDownstreamPacket(int id, int lightNumber, char* message)
-{
+{  
+  //Construct a one payload message.
+  char temp[80];
+  temp[0] = (char) lightNumber;
+  temp[1] = (char) strlen(message);
+  strcat(temp, message);
   
-  Serial.print("Light number is: ");
-  Serial.println(lightNumber);
-  Serial.print("In send Downstream packet, the packet I would have sent is: ");
-  Serial.print(message);
-  Serial.print(" to id:");
-  Serial.println(id);
-  
-  char string[80];
-  string[0] = (char) lightNumber;
-  string[1] = (char) strlen(message);
-  strcat(string, message);
-  
-  Serial.print("String: "); 
-  Serial.println(string);
-  
+  Serial.println("Sending response to slave");
   Wire.beginTransmission(id);
-  Wire.send(string);
+  Wire.send(temp);
   Wire.endTransmission();
-
 }
 
 //Parses http response and stores downstreampacket in message
