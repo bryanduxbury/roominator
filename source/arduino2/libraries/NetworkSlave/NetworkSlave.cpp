@@ -22,8 +22,8 @@ int NetworkSlave::getReserve() {
   return ud.getReserve();
 }
 
-void NetworkSlave::setDownstreamData(char *received) {
-  dd = DownstreamDataParser::parseDownstreamData(received);
+void NetworkSlave::setDownstreamData(char* received) {
+  DownstreamDataParser::parseAndUpdateDownstreamData(received, &dd);
 }
 
 void NetworkSlave::reserve() {

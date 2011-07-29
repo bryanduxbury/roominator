@@ -18,7 +18,7 @@ void setup() {
   reserve.initialize();
   cancel.initialize();
   
-  //Serial.begin(9600);
+  Serial.begin(9600);
   Wire.begin(1);
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
@@ -38,33 +38,28 @@ void setup() {
   dc.setDisplayColor(color);
 }
 
-void loop() {
-  delay(50);
-  
+void loop() {  
   if (reserve.check()) {
     slave.reserve();
+    dc.setDisplayColor(YELLOW);
   }
   
   if (cancel.check()) {
     slave.cancel();
+    dc.setDisplayColor(YELLOW);
   }
 }
 
 void handleRequest() {
-  Serial.println("In handle request");
-//  handleEncodedIntegerRequest();
-  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
-//  handleCharArrayRequest();
+  handleEncodedIntegerRequest();
 }
 
 void handleEncodedIntegerRequest() {
-  Serial.println("In encoded int before send");
-  Serial.println((slave.getCancel()) ? 0xFF : slave.getReserve());
-//  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
-  Wire.send('a');
-  Serial.println("In encoded int after send");
+  Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
 }
 
+
+//Take this OUT!
 void handleCharArrayRequest() {
   char message[2];
   message[0] = (char) slave.getCancel();
@@ -73,26 +68,37 @@ void handleCharArrayRequest() {
 }
 
 void handleReceive(int numBytes) {
-  char packet[numBytes];
-  
-  for (int i=0; Wire.available(); i++) {
-    packet[i] = Wire.receive();
+  Serial.print("Number of bytes is: ");
+  Serial.println(numBytes);
+  char* packet = (char*) malloc(numBytes);
+  int i = 0;
+  char temp;
+  while(Wire.available())
+  {
+    temp = Wire.receive();
+    Serial.print(i);
+    Serial.println(temp);
+    packet[i] = temp;
+    i++;
   }
   
-  slave.setDownstreamData(packet);
+  if (numBytes != 0) {
+    slave.setDownstreamData(packet);
+    free(packet);
   
-  lcd.setCursor(0,0);
-  lcd.print(slave.getDisplayString());
+    lcd.setCursor(0,0);
+    lcd.print(slave.getDisplayString());
   
-  DisplayColor color;
-  if (slave.getCurrentReservation()) {
-    color = RED;
-  } else if (slave.getPendingReservation()) {
-    color = YELLOW;
-  } else {
-    color = GREEN;
+    DisplayColor color;
+    if (slave.getCurrentReservation()) {
+      color = RED;
+    } else if (slave.getPendingReservation()) {
+      color = YELLOW;
+    } else {
+      color = GREEN;
+    }
+    
+    dc.setDisplayColor(color);
   }
-  
-  dc.setDisplayColor(color);
 }
 

@@ -1,5 +1,6 @@
 #include <DownstreamData.h>
 #include <string.h>
+#include <stdlib.h>
 
 DownstreamData::DownstreamData() {}
 
@@ -24,5 +25,7 @@ char* DownstreamData::getDisplayString() {
 }
 
 void DownstreamData::setDisplayString(char *value) {
+  //Make sure it is large enough
+  displayString = (char*) realloc(displayString, strlen(value));
   strcpy(displayString, value);
 }
