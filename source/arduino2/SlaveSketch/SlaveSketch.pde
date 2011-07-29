@@ -8,10 +8,10 @@
 #include <string.h>
  
 //Junior
-//int fig[] = {2,3,4,5,6,7,8,9,10,11,12,1};
+int fig[] = {2,3,4,5,6,8,9,10,11,12,13,1};
 
 //Senior 
-int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
+//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
 
 // [GreenPin, YellowPin, RedPin, ResPin, CancelPin, LCD1, LCD2, LCD3, LCD4, LCD5, LCD6, I2CAddress]
 //byte fig[12];
