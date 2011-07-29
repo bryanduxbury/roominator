@@ -93,7 +93,7 @@ void loop()
 void sendDownstreamPacket(int id, int lightNumber, char* message)
 {  
   //Construct a one payload message.
-  char temp[83];
+  char temp[strlen(message) + 10];
   temp[0] = (char) lightNumber;
   temp[1] = (char) strlen(message);
   for (int i = 0; i < strlen(message); i++)
