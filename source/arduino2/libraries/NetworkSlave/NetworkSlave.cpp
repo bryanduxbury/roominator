@@ -11,7 +11,7 @@ NetworkSlave::NetworkSlave() {
   dd = DownstreamData();
   dd.setCurrentReservation(true);
   dd.setPendingReservation(false);
-  dd.setDisplayString("Gareth");
+  dd.setDisplayString("Starting up...");
 }
 
 int NetworkSlave::getCancel() {
@@ -36,6 +36,10 @@ void NetworkSlave::cancel() {
     ud.setReserve(0);
     ud.setCancel(true);
   }
+}
+
+void NetworkSlave::setDisplayString(char *displayString) {
+  dd.setDisplayString(displayString);
 }
 
 char* NetworkSlave::getDisplayString() {

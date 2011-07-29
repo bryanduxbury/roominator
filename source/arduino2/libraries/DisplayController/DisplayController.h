@@ -10,7 +10,7 @@ enum DisplayColor {
 
 class DisplayController {
 public:
-  DisplayController(char displayName[]);
+  DisplayController(char displayName[], int redPin, int yellowPin, int greenPin);
   void setDisplayColor(DisplayColor displayColor);
   void onPressReserveOrExtend();
   void onPressCancel();
@@ -18,6 +18,9 @@ public:
 private:
   char _displayName[];
   DisplayColor _displayColor;
+  int redPin;
+  int yellowPin;
+  int greenPin;
   
   void setHigh(DisplayColor displayColor);
 };
