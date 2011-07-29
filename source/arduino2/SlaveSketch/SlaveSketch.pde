@@ -13,7 +13,7 @@ BounceButton reserve(2);
 BounceButton cancel(5);
 
 void setup() {
-  lcd.begin(19, 4);
+  lcd.begin(20, 4);
   
   reserve.initialize();
   cancel.initialize();
@@ -24,6 +24,15 @@ void setup() {
   Wire.onRequest(handleRequest);
   
   lcd.setCursor(0,0);
+  lcd.print("1234567890abcdefghij");
+  lcd.setCursor(1,0);
+  lcd.print("1234567890abcdefghij");
+  lcd.setCursor(2,0);
+  lcd.print("1234567890abcdefghij");
+  lcd.setCursor(3,0);
+  lcd.print("1234567890abcdefghij");
+
+  lcd.clear();
   lcd.print(slave.getDisplayString());
   
   DisplayColor color;
