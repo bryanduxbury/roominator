@@ -12,9 +12,7 @@ byte ip[] = { 10, 99, 33, 128 }; //IP address of arduino
 byte gateway[] = { 10, 99, 33, 254 }; //IP address of router in office
 byte subnet[] = { 255, 255, 254, 0 }; //subnet mask of office network
 
-byte server[] = {10, 99, 32, 39 }; //My comp
-
-int slaves[] = { 1 }; //Put addresses for slaves here
+byte server[] = {10, 99, 32, 39 }; //Gabe's comp
 
 Client client(server, 3000);
 

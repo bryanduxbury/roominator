@@ -53,3 +53,9 @@ bool NetworkSlave::getCurrentReservation() {
 bool NetworkSlave::getPendingReservation() {
   return dd.getPendingReservation();
 }
+
+void NetworkSlave::clearCounts() {
+  ud.setReserve(0);
+  ud.setCancel(false);
+}
+}

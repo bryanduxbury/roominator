@@ -16,6 +16,7 @@ class NetworkSlave {
     bool getPendingReservation();
     void setDisplayString(char *displayString);
     char* getDisplayString();
+    void clearCounts();
   
   private:
     UpstreamData ud;

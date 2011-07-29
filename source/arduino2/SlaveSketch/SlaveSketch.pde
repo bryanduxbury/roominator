@@ -57,7 +57,7 @@ void setup() {
   dc.setDisplayColor(color);
 }
 
-void loop() {  
+void loop() { 
   if (reserve.check()) {
     slave.reserve();
     if (slave.getCancel() || (slave.getReserve() != 0)) {
@@ -80,55 +80,56 @@ void loop() {
 }
 
 void handleRequest() {
-  handleEncodedIntegerRequest();
-}
-
-void handleEncodedIntegerRequest() {
   Wire.send((slave.getCancel()) ? 0xFF : slave.getReserve());
-}
-
-
-//Take this OUT!
-void handleCharArrayRequest() {
-  char message[2];
-  message[0] = (char) slave.getCancel();
-  message[1] = (char) slave.getReserve();
-  Wire.send(message);
+  slave.clearCounts();
 }
 
 void handleReceive(int numBytes) {
-  Serial.print("Number of bytes is: ");
-  Serial.println(numBytes);
-  char* packet = (char*) malloc(numBytes);
-  int i = 0;
-  char temp;
-  while(Wire.available())
-  {
-    temp = Wire.receive();
-    Serial.print(i);
-    Serial.println(temp);
-    packet[i] = temp;
-    i++;
-  }
-  
-  if (numBytes != 0) {
-    slave.setDownstreamData(packet);
-    free(packet);
-    
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(slave.getDisplayString());
-  
-    DisplayColor color;
-    if (slave.getCurrentReservation()) {
-      color = RED;
-    } else if (slave.getPendingReservation()) {
-      color = YELLOW;
-    } else {
-      color = GREEN;
+  //If counts have incremented after we sent count, but before we were able to set the data
+  if (!(slave.getCancel() || slave.getReserve()))
+    {
+    Serial.print("Number of bytes is: ");
+    Serial.println(numBytes);
+    char* packet = (char*) malloc(numBytes);
+    int i = 0;
+    //TAKE OUT TEMP, for debugging only
+    char temp;
+    while(Wire.available())
+    {
+      temp = Wire.receive();
+      Serial.print(i);
+      Serial.println(temp);
+      packet[i] = temp;
+      i++;
     }
     
-    dc.setDisplayColor(color);
+    if (numBytes != 0) {
+      slave.setDownstreamData(packet);
+      free(packet);
+      
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(slave.getDisplayString());
+    
+      DisplayColor color;
+      if (slave.getCurrentReservation()) {
+        color = RED;
+      } else if (slave.getPendingReservation()) {
+        color = YELLOW;
+      } else {
+        color = GREEN;
+      }
+      
+      dc.setDisplayColor(color);
+    }
+  }
+  //We want to dump the string the server sent us
+  else
+  {
+    while(Wire.available())
+    {
+      Wire.receive();  
+    }
   }
 }
 
