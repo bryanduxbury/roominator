@@ -12,10 +12,8 @@ class NetworkSlave {
     void cancel();
     int getReserve();
     int getCancel();
-    bool getCurrentReservation();
-    bool getPendingReservation();
-    void setDisplayString(char *displayString);
-    char* getDisplayString();
+    Reservation* getCurrentReservation();
+    Reservation* getPendingReservation();
     void clearCounts();
 
     void handleReceive(int numBytes);

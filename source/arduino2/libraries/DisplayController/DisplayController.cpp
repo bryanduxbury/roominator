@@ -15,8 +15,6 @@ DisplayController::DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, in
   this->redPin = redPin;
   this->yellowPin = yellowPin;
   this->greenPin = greenPin;
-  strcpy(_displayName, "  waiting to sync   ");
-  strcpy(_currentReservation, "                    ");
 
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
@@ -56,22 +54,17 @@ void DisplayController::setHigh(DisplayColor displayColor) {
   digitalWrite(greenPin, (displayColor == GREEN) ? HIGH : LOW);
 }
 
-void DisplayController::setDisplayColor(DisplayColor displayColor) {
-  _displayColor = displayColor;
-}
-
-void DisplayController::setDisplayName(char* displayName) {
-  strncpy(_displayName, displayName, 20);
-}
-
 void DisplayController::draw() {
   setHigh(_displayColor);
 
   lcd->clear();
   lcd->setCursor(0,0);
-  lcd->print(_displayName);
+  lcd->print(slave->getRoomName);
   lcd->setCursor(0,1);
-  lcd->print(_currentReservation);
+  lcd->print(slave->getCurrentReservation.textLine1);
+  lcd->setCursor(0,2);
+  lcd->print(slave->getCurrentReservation.textLine2);
+
   lcd->setCursor(0,3);
   lcd->print("Reserve");
   lcd->setCursor(13,3);

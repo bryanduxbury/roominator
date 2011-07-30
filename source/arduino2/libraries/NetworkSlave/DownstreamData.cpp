@@ -4,28 +4,20 @@
 
 DownstreamData::DownstreamData() {}
 
-bool DownstreamData::getCurrentReservation() {
-  return currentReservation;
+void DownstreamData::parseAndUpdate(char* packet) {
+  memcpy(roomName, packet, 20);
+  memcpy(&currentReservation, packet+20, sizeof(Reservation));
+  memcpy(&pendingReservation, packet+20 + sizeof(Reservation), sizeof(Reservation));
 }
 
-void DownstreamData::setCurrentReservation(bool value) {
-  currentReservation = value;
+char* DownstreamData::getRoomName() {
+  return roomName;
 }
 
-bool DownstreamData::getPendingReservation() {
-  return pendingReservation;
+Reservation* DownstreamData::getCurrentReservation() {
+  return &currentReservation;
 }
 
-void DownstreamData::setPendingReservation(bool value) {
-  pendingReservation = value;
-}
-
-char* DownstreamData::getDisplayString() {
-  return displayString;
-}
-
-void DownstreamData::setDisplayString(char *value) {
-  //Make sure it is large enough
-  displayString = (char*) realloc(displayString, strlen(value));
-  strcpy(displayString, value);
+Reservation* DownstreamData::getNextReservation() {
+  return &pendingReservation;
 }

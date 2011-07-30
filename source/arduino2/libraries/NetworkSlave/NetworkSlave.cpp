@@ -1,7 +1,6 @@
 #include "NetworkSlave.h"
 #include "WProgram.h"
 #include "Wire.h"
-#include "DownstreamDataParser.h"
 
 NetworkSlave::NetworkSlave() {
   ud = UpstreamData();
@@ -9,9 +8,6 @@ NetworkSlave::NetworkSlave() {
   ud.setReserve(0);
 
   dd = DownstreamData();
-  dd.setCurrentReservation(true);
-  dd.setPendingReservation(false);
-  dd.setDisplayString("Starting up...");
 }
 
 void NetworkSlave::readFully(char* buf) {
@@ -47,7 +43,7 @@ int NetworkSlave::getReserve() {
 }
 
 void NetworkSlave::setDownstreamData(char* received) {
-  DownstreamDataParser::parseAndUpdateDownstreamData(received, &dd);
+  dd.parseAndUpdate(received);
 }
 
 void NetworkSlave::reserve() {
@@ -62,20 +58,12 @@ void NetworkSlave::cancel() {
   }
 }
 
-void NetworkSlave::setDisplayString(char *displayString) {
-  dd.setDisplayString(displayString);
-}
-
-char* NetworkSlave::getDisplayString() {
-	return dd.getDisplayString();
-}
-
-bool NetworkSlave::getCurrentReservation() {
+Reservation* NetworkSlave::getCurrentReservation() {
   return dd.getCurrentReservation();
 }
 
-bool NetworkSlave::getPendingReservation() {
-  return dd.getPendingReservation();
+Reservation* NetworkSlave::getPendingReservation() {
+  return dd.getNextReservation();
 }
 
 void NetworkSlave::clearCounts() {

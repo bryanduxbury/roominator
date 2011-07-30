@@ -13,12 +13,6 @@ class DisplayController {
 public:
   DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin);
 
-  void setDisplayName(char* displayName);
-
-  void setDisplayColor(DisplayColor displayColor);
-
-  void setCurrentReservation(char* currentReservation);
-
   void onPressReserveOrExtend();
   void onPressCancel();
 
@@ -30,9 +24,6 @@ private:
   NetworkSlave* slave;
 
   char _displayName[21];
-  char _currentReservation[21];
-  DisplayColor _displayColor;
-
 
   int redPin;
   int yellowPin;

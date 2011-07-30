@@ -1,20 +1,26 @@
 #ifndef DownstreamData_h
 #define DownstreamData_h
 
+struct Reservation {
+  char textLine1[21] = "                    ";
+  char textLine2[21] = "                    ";
+  short secs;
+};
+
 class DownstreamData {
   public:
     DownstreamData();
-    bool getCurrentReservation();
-    void setCurrentReservation(bool value);
-    bool getPendingReservation();
-    void setPendingReservation(bool value);
-    char* getDisplayString();
-    void setDisplayString(char* value);
-    
+
+    void parseAndUpdate(char* packet);
+
+    char* getRoomName();
+    Reservation* getCurrentReservation();
+    Reservation* getNextReservation();
+
   private:
-    bool currentReservation;
-    bool pendingReservation;
-    char* displayString;
+    char roomName[21] = "  waiting to sync   ";
+    Reservation currentReservation;
+    Reservation pendingReservation;
 };
 
 #endif
