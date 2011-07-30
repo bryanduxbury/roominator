@@ -76,7 +76,7 @@ void loop() {
       lcd.print(slave.getDisplayString());
     }
   }
-  
+
   if (cancel.check()) {
     slave.cancel();
     if (slave.getCancel() || (slave.getReserve() != 0)) {
