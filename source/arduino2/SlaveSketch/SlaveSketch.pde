@@ -31,15 +31,15 @@ BounceButton cancel(fig[4]);
 
 void setup() {
   lcd.begin(20, 4);
-  
+
   reserve.initialize();
   cancel.initialize();
-  
+
   Serial.begin(9600);
   Wire.begin(fig[11]);
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
-  
+
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("1234567890abcdefghij");
@@ -52,7 +52,7 @@ void setup() {
   delay(2000);
   lcd.clear();
   lcd.print(slave.getDisplayString());
-  
+
   DisplayColor color;
   if (slave.getCurrentReservation()) {
     color = RED;
@@ -61,7 +61,7 @@ void setup() {
   } else {
     color = GREEN;
   }
-  
+
   dc.setDisplayColor(color);
 }
 
