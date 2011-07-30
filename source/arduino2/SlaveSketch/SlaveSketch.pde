@@ -95,10 +95,10 @@ void handleRequest() {
 }
 
 void handleReceive(int numBytes) {
-    Serial.println("in receive");
+  Serial.println("in receive");
   //If counts have incremented after we sent count, but before we were able to set the data
   if (!(slave.getCancel() || slave.getReserve()))
-    {
+  {
     Serial.print("Number of bytes is: ");
     Serial.println(numBytes);
     char* packet = (char*) malloc(numBytes);
@@ -113,15 +113,15 @@ void handleReceive(int numBytes) {
       packet[i] = temp;
       i++;
     }
-    
+
     if (numBytes != 0) {
       slave.setDownstreamData(packet);
       free(packet);
-      
+
       lcd.clear();
       lcd.setCursor(0,0);
       lcd.print(slave.getDisplayString());
-    
+
       DisplayColor color;
       if (slave.getCurrentReservation()) {
         color = RED;
@@ -130,7 +130,7 @@ void handleReceive(int numBytes) {
       } else {
         color = GREEN;
       }
-      
+
       dc.setDisplayColor(color);
     }
   }
