@@ -104,9 +104,8 @@ void handleReceive(int numBytes) {
     if (numBytes != 0) {
       char packet[numBytes];
       readFully(&packet);
-    
+
       slave.setDownstreamData(packet);
-      free(packet);
 
       lcd.clear();
       lcd.setCursor(0,0);
@@ -123,12 +122,9 @@ void handleReceive(int numBytes) {
 
       dc.setDisplayColor(color);
     }
-  }
-  //We want to dump the string the server sent us
-  else
-  {
-    while(Wire.available())
-    {
+  } else {
+    //We want to dump the string the server sent us
+    while(Wire.available()) {
       Wire.receive();
     }
   }
