@@ -97,24 +97,14 @@ void handleRequest() {
 void handleReceive(int numBytes) {
   Serial.println("in receive");
   //If counts have incremented after we sent count, but before we were able to set the data
-  if (!(slave.getCancel() || slave.getReserve()))
-  {
+  if (!(slave.getCancel() || slave.getReserve())) {
     Serial.print("Number of bytes is: ");
     Serial.println(numBytes);
-    char* packet = (char*) malloc(numBytes);
-    int i = 0;
-    //TAKE OUT TEMP, for debugging only
-    char temp;
-    while(Wire.available())
-    {
-      temp = Wire.receive();
-      Serial.print(i);
-      Serial.println(temp);
-      packet[i] = temp;
-      i++;
-    }
 
     if (numBytes != 0) {
+      char packet[numBytes];
+      readFully(&packet);
+    
       slave.setDownstreamData(packet);
       free(packet);
 
@@ -144,3 +134,9 @@ void handleReceive(int numBytes) {
   }
 }
 
+void readFully(char* buf) {
+  while (Wire.available()) {
+    *buf = Wire.receive();
+    buf++;
+  }
+}
