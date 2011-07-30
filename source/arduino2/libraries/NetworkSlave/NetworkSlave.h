@@ -17,10 +17,14 @@ class NetworkSlave {
     void setDisplayString(char *displayString);
     char* getDisplayString();
     void clearCounts();
-  
+
+    void handleReceive(int numBytes);
+
   private:
     UpstreamData ud;
     DownstreamData dd;
+
+    void readFully(char* buf);
 };
 
 #endif
