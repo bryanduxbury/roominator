@@ -139,7 +139,7 @@ void handleReceive(int numBytes) {
   {
     while(Wire.available())
     {
-      Wire.receive();  
+      Wire.receive();
     }
   }
 }
