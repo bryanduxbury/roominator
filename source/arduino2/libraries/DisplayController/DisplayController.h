@@ -29,5 +29,5 @@ private:
   int yellowPin;
   int greenPin;
 
-  void setHigh(DisplayColor displayColor);
+  void setHigh(int displayColor);
 };

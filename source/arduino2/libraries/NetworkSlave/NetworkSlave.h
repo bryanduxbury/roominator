@@ -13,7 +13,8 @@ class NetworkSlave {
     int getReserve();
     int getCancel();
     Reservation* getCurrentReservation();
-    Reservation* getPendingReservation();
+    Reservation* getNextReservation();
+    char* getRoomName();
     void clearCounts();
 
     void handleReceive(int numBytes);

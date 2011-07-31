@@ -48,25 +48,43 @@ DisplayController::DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, in
   lcd->clear();
 }
 
-void DisplayController::setHigh(DisplayColor displayColor) {
+void DisplayController::setHigh(int displayColor) {
   digitalWrite(redPin, (displayColor == RED) ? HIGH : LOW);
   digitalWrite(yellowPin, (displayColor == YELLOW) ? HIGH : LOW);
   digitalWrite(greenPin, (displayColor == GREEN) ? HIGH : LOW);
 }
 
 void DisplayController::draw() {
-  setHigh(_displayColor);
+  int displayColor = GREEN;
+
+  // negative secs on next reservation means that there is no current reservation
+  if (slave->getCurrentReservation()->secs > 0) {
+    displayColor = RED;
+  } else if (slave->getNextReservation()->secs > 0 && slave->getNextReservation()->secs < 60*15) {
+    // the next reservation is less than 15 minutes away, so light the yellow LED
+    displayColor = YELLOW;
+  }
+
+  setHigh(displayColor);
 
   lcd->clear();
   lcd->setCursor(0,0);
-  lcd->print(slave->getRoomName);
+  lcd->print(slave->getRoomName());
   lcd->setCursor(0,1);
-  lcd->print(slave->getCurrentReservation.textLine1);
+  lcd->print(slave->getCurrentReservation()->textLine1);
   lcd->setCursor(0,2);
-  lcd->print(slave->getCurrentReservation.textLine2);
+  lcd->print(slave->getCurrentReservation()->textLine2);
 
   lcd->setCursor(0,3);
-  lcd->print("Reserve");
-  lcd->setCursor(13,3);
-  lcd->print("Cancel");
+  if (displayColor == GREEN) {
+    lcd->print("Reserve");
+  } else if (displayColor == RED) {
+    lcd->print("Extend");
+  }
+
+  if (displayColor == RED) {
+    lcd->setCursor(13,3);
+    lcd->print("Cancel");
+  }
+
 }
