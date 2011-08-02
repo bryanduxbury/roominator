@@ -6,8 +6,10 @@ DownstreamData::DownstreamData() {
   strcpy(roomName, "  waiting to sync   ");
   strcpy(currentReservation.textLine1, "                    ");
   strcpy(currentReservation.textLine2, "                    ");
+  currentReservation.secs = 0;
   strcpy(nextReservation.textLine1, "                    ");
   strcpy(nextReservation.textLine2, "                    ");
+  nextReservation.secs = 0;
 }
 
 void DownstreamData::parseAndUpdate(char* packet) {

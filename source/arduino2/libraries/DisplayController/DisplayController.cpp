@@ -15,11 +15,14 @@ DisplayController::DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, in
   this->redPin = redPin;
   this->yellowPin = yellowPin;
   this->greenPin = greenPin;
+}
 
+void DisplayController::begin() {
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
 
+  lcd->begin(20, 4);
   // display the self-test
   lcd->clear();
   lcd->setCursor(0,0);
@@ -67,7 +70,6 @@ void DisplayController::draw() {
 
   setHigh(displayColor);
 
-  lcd->clear();
   lcd->setCursor(0,0);
   lcd->print(slave->getRoomName());
   lcd->setCursor(0,1);
@@ -76,15 +78,20 @@ void DisplayController::draw() {
   lcd->print(slave->getCurrentReservation()->textLine2);
 
   lcd->setCursor(0,3);
+  char buttonBuffer[21];
+  buttonBuffer[20] = '\0';
+
+  memset(buttonBuffer, ' ', 20);
   if (displayColor == GREEN) {
-    lcd->print("Reserve");
+    memcpy(buttonBuffer, "Reserve", 7);
   } else if (displayColor == RED) {
-    lcd->print("Extend");
+    memcpy(buttonBuffer, "Extend", 6);
   }
 
   if (displayColor == RED) {
-    lcd->setCursor(13,3);
-    lcd->print("Cancel");
+    // lcd->setCursor(13,3);
+    // lcd->print("Cancel");
+    memcpy(buttonBuffer + 13, "Cancel", 6);
   }
-
+  lcd->print(buttonBuffer);
 }

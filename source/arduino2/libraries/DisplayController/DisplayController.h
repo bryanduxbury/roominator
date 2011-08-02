@@ -16,6 +16,8 @@ public:
   void onPressReserveOrExtend();
   void onPressCancel();
 
+  void begin();
+
   // Do all the actual display logic.
   void draw();
 

@@ -9,10 +9,10 @@
 
 // [GreenPin, YellowPin, RedPin, ResPin, CancelPin, LCD1, LCD2, LCD3, LCD4, LCD5, LCD6, I2CAddress]
 //Junior
-//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,1};
+int fig[] = {4,3,2,6,5,8,9,10,11,12,13,1};
 
 //Senior 
-int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
+//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
 
 NetworkSlave slave;
 LiquidCrystal lcd(fig[5], fig[6], fig[7], fig[8], fig[9], fig[10]);
@@ -22,12 +22,10 @@ BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
 
 void setup() {
-  lcd.begin(20, 4);
-
+  dc.begin();
   reserve.initialize();
   cancel.initialize();
-
-  Serial.begin(9600);
+  
   Wire.begin(fig[11]);
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
@@ -43,6 +41,7 @@ void loop() {
   }
 
   dc.draw();
+  delay(100);
 }
 
 void handleRequest() {
