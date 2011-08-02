@@ -58,6 +58,7 @@ void DisplayController::setHigh(int displayColor) {
 }
 
 void DisplayController::draw() {
+  noInterrupts();
   int displayColor = GREEN;
 
   // negative secs on next reservation means that there is no current reservation
@@ -94,4 +95,5 @@ void DisplayController::draw() {
     memcpy(buttonBuffer + 13, "Cancel", 6);
   }
   lcd->print(buttonBuffer);
+  interrupts();
 }

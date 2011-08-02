@@ -11,10 +11,15 @@ NetworkSlave::NetworkSlave() {
 }
 
 void NetworkSlave::readFully(char* buf) {
-  while (Wire.available()) {
+  int i = 0;
+  while (Wire.available() && i < 109) {
     *buf = Wire.receive();
     buf++;
+    i++;
   }
+  // Serial.print("Read ");
+  // Serial.print(i);
+  // Serial.println(" bytes");
 }
 
 void NetworkSlave::handleReceive(int numBytes) {

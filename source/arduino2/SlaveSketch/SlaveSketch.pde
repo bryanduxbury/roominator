@@ -22,6 +22,7 @@ BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
 
 void setup() {
+  Serial.begin(9600);
   dc.begin();
   reserve.initialize();
   cancel.initialize();
