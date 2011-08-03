@@ -3,7 +3,7 @@
 LongWireMaster::LongWireMaster(size_t bufferSize) {
   this->buffer = (byte*)malloc(bufferSize + 2) + 2;
   this->capa = bufferSize;
-  this->off = 0;
+  this->off = 2;
   this->limit = 0;
 }
 
@@ -29,18 +29,21 @@ void LongWireMaster::send(byte* data, size_t size) {
 }
 
 int LongWireMaster::endTransmission() {
-  this->off = -2;
-  buffer[-1] = this->limit & 0xFF;
-  buffer[-2] = (this->limit >> 8) & 0xFF;
-  
+  this->off = 0;
+  buffer[0] = this->limit & 0xFF;
+  buffer[1] = (this->limit >> 8) & 0xFF;
 
-  Wire.send(frameSize, 2);
-  
-  int availSpace = 30;
-  
+  byte* tmpBuffer = buffer;
+
   while (off < limit) {
+    int toWrite = min(32, this->limit - this->off);
     Wire.beginTransmission(address);
-    Wire.send
-    availSpace = 32;
+    Wire.send(buffer, toWrite);
+    int result = Wire.endTransmission();
+    if (result != 0) {
+      return result;
+    }
+    buffer+=toWrite;
+    off+=toWrite;
   }
 }
