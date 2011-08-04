@@ -28,7 +28,7 @@ BounceButton cancel(fig[4]);
 LongWireSlave wireSlave(fig[11], 109, handleFullReceive, handleFullRequest);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   dc.begin();
   reserve.initialize();
   cancel.initialize();
@@ -62,14 +62,23 @@ void handleFullRequest() {
 
 
 void handleReceive(int numBytes) {
+  Serial.println("in handleReceive");
+  Serial.print("num bytes: ");
+  Serial.println(numBytes);
   wireSlave.onReceive(numBytes);
 }
 
 void handleFullReceive(int numBytes) {
+  Serial.print("handleFullReceive with ");
+  Serial.println(numBytes);
   char buf[109];
   char* ptr = buf;
+  int i = 0;
   while (wireSlave.available()) {
     (*ptr++) = (char)wireSlave.receive();
+    i++;
   }
+  Serial.print("read a total of ");
+  Serial.println(i);
   slave.setDownstreamData(buf);
 }

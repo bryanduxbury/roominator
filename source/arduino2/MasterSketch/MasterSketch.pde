@@ -21,7 +21,7 @@ LongWireMaster wireMaster(109);
 
 void setup()
 {
-//  Serial.begin(9600);  //For debugging, take out eventually
+  Serial.begin(9600);  //For debugging, take out eventually
 //  Wire.begin(); //join bus as master
   wireMaster.begin();
   Ethernet.begin(mac, ip, gateway, subnet);
@@ -37,15 +37,15 @@ void loop()
   delay(1000);
 
   //Loop over addresses 1 thru 9
-  for(int i = 1; i < 9; i++) {
-//    Serial.println("before");
+  for(int i = 1; i < 2; i++) {
+    Serial.println("before");
     Wire.requestFrom(i, 1); //request 1 bytes from slave
-//    Serial.println("after");
+    Serial.println("after");
 
     //if the slave is responsive...
     if (Wire.available()) {
-//      Serial.print("Got response from slave: ");
-//      Serial.println(i);
+      Serial.print("Got response from slave: ");
+      Serial.println(i);
       payload = (int) Wire.receive();
       if (payload == 255) {
         cancel = 1;
@@ -59,17 +59,17 @@ void loop()
       generatePostRequest(i, reserveCount, cancel, message);
  
       while(!client.connect()) {
-//        Serial.println("Could not connect, trying again");
+        Serial.println("Could not connect, trying again");
       }
-//      Serial.println("Connected to server, sending request");
+      Serial.println("Connected to server, sending request");
       //Send request
       client.println(message);
       client.println();
 
-//      Serial.println("Waiting for server response");
+      Serial.println("Waiting for server response");
       while(!client.available()) {delay(10);}
 
-//      Serial.println("Got response from server");
+      Serial.println("Got response from server");
 
       char response[109];
       parseHttpResponse(response);
@@ -79,10 +79,10 @@ void loop()
       sendDownstreamPacket(i, response);
 
       client.stop();
-//      Serial.println("Disconnected from server");
+      Serial.println("Disconnected from server");
     } else {
-//      Serial.print("Slave was not responsive: ");
-//      Serial.println(i);
+      Serial.print("Slave was not responsive: ");
+      Serial.println(i);
     }
   }
 }

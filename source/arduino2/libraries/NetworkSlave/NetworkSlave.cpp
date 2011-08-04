@@ -20,6 +20,7 @@ int NetworkSlave::getReserve() {
 
 void NetworkSlave::setDownstreamData(char* received) {
   if (getCancel() || getReserve()) {
+    Serial.println("skipping this message from the master");
     return;
   }
 

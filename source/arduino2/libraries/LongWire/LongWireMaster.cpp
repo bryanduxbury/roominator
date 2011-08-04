@@ -19,6 +19,11 @@ void LongWireMaster::beginTransmission(int address) {
 void LongWireMaster::send(byte b) {
   this->buffer[off++] = b;
   limit = off;
+  Serial.print("off: ");
+  Serial.print(off);
+  Serial.print("lim: ");
+  Serial.print(limit);
+  Serial.println();
 }
 
 void LongWireMaster::send(char* str) {
@@ -50,5 +55,8 @@ int LongWireMaster::endTransmission() {
     }
     buffer+=toWrite;
     off+=toWrite;
+    frameNum++;
   }
+  off = 0;
+  limit = 0;
 }

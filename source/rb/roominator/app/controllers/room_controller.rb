@@ -20,7 +20,7 @@ class RoomController < ApplicationController
     new_reserved_button_presses = params[:rsv].to_i
     new_cancel_button_presses   = params[:cancel].to_i
 
-    data = [200, "living room", 0, "line 1", 0, "line3", 0, 0, "line4", 0, "line5", 0, 0].pack("CA20CA20CA20CnA20CA20Cn1")
+    data = [200, "living room", 0, "line 2", 0, "line 3", 0, 0, "line4", 0, "line5", 0, 0].pack("CA20CA20CA20CnA20CA20Cn1")
     puts data.length
     puts data.inspect
 
