@@ -20,7 +20,7 @@ class RoomController < ApplicationController
     new_reserved_button_presses = params[:rsv].to_i
     new_cancel_button_presses   = params[:cancel].to_i
 
-    data = [200, "living room", 0, "line 2", 0, "line 3", 0, 0, "line4", 0, "line5", 0, 0].pack("CA20CA20CA20CnA20CA20Cn1")
+    data = [200, current_room.room_name[0..20], 0, "r1 line 1", 0, "r1 line 2", 0, 0, "r2 line1", 0, "r2 line2", 0, 10].pack("CA20CA20CA20CvA20CA20Cv")
     puts data.length
     puts data.inspect
 
@@ -54,26 +54,26 @@ class RoomController < ApplicationController
     render :text => data
   end
 
-  # def setup_rooms
-  #   existing_rooms = Room.all
-  #   
-  #   params[:num_cols].to_i.times do |row|
-  #     if row < existing_rooms.length # row already exists in the table
-  #       room = existing_rooms[row]
-  #       room.destroy and next if params["delete_#{row}"]
-  #       room.updated_at = Time.now
-  #     else
-  #       next if params["delete_#{row}"]
-  #       room = Room.new(:created_at => Time.now, :updated_at => Time.now)
-  #     end
-  #     
-  #     room.calendar_name = params["text_c_name_#{row}"]
-  #     room.calendar_id   = params["text_c_id_#{row}"]
-  #     room.room_name     = params["text_r_name_#{row}"]
-  #     room.room_number   = params["text_r_number_#{row}"]
-  #     room.save!
-  #   end
-  #   
-  #   redirect_to :back
-  # end
+  def setup_rooms
+    existing_rooms = Room.all
+
+    params[:num_cols].to_i.times do |row|
+      if row < existing_rooms.length # row already exists in the table
+        room = existing_rooms[row]
+        room.destroy and next if params["delete_#{row}"]
+        room.updated_at = Time.now
+      else
+        next if params["delete_#{row}"]
+        room = Room.new(:created_at => Time.now, :updated_at => Time.now)
+      end
+
+      room.calendar_name = params["text_c_name_#{row}"]
+      room.calendar_id   = params["text_c_id_#{row}"]
+      room.room_name     = params["text_r_name_#{row}"]
+      room.room_number   = params["text_r_number_#{row}"]
+      room.save!
+    end
+    
+    redirect_to :back
+  end
 end

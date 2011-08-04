@@ -60,11 +60,11 @@ void DisplayController::setHigh(int displayColor) {
 void DisplayController::draw() {
   noInterrupts();
   int displayColor = GREEN;
-
+  Serial.println(slave->getNextReservation()->secs);
   // negative secs on next reservation means that there is no current reservation
   if (slave->getCurrentReservation()->secs > 0) {
     displayColor = RED;
-  } else if (slave->getNextReservation()->secs > 0 && slave->getNextReservation()->secs < 60*15) {
+  } else if ((slave->getNextReservation()->secs > 0) && (slave->getNextReservation()->secs < 60*15)) {
     // the next reservation is less than 15 minutes away, so light the yellow LED
     displayColor = YELLOW;
   }

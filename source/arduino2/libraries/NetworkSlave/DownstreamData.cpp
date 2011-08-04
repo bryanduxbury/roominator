@@ -18,10 +18,8 @@ void DownstreamData::parseAndUpdate(char* packet) {
   memcpy(roomName, packet, 20);
   packet+=21;
 
-  memcpy(currentReservation.textLine1, packet, 20);
-  packet+=21;
-  memcpy(currentReservation.textLine2, packet, 20);
-  // memcpy(nextReservation.textLine12, packet+20 + sizeof(Reservation), sizeof(Reservation));
+  memcpy(&currentReservation, packet, sizeof(Reservation));
+  memcpy(&nextReservation, packet + sizeof(Reservation), sizeof(Reservation));
 }
 
 char* DownstreamData::getRoomName() {
