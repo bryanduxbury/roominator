@@ -10,35 +10,6 @@ NetworkSlave::NetworkSlave() {
   dd = DownstreamData();
 }
 
-void NetworkSlave::readFully(char* buf) {
-  int i = 0;
-  while (Wire.available() && i < 109) {
-    *buf = Wire.receive();
-    buf++;
-    i++;
-  }
-  // Serial.print("Read ");
-  // Serial.print(i);
-  // Serial.println(" bytes");
-}
-
-void NetworkSlave::handleReceive(int numBytes) {
-  char packet[numBytes];
-  if (numBytes != 0) {
-    readFully(packet);
-  }
-
-  // if cancel or reserve have been pressed but not reported yet, then we want 
-  // to ignore the upstream message.
-  if (getCancel() || getReserve()) {
-    return;
-  }
-
-  Serial.print("Number of bytes is: ");
-  Serial.println(numBytes);
-  setDownstreamData(packet);
-}
-
 int NetworkSlave::getCancel() {
   return ud.getCancel();
 }
@@ -48,6 +19,10 @@ int NetworkSlave::getReserve() {
 }
 
 void NetworkSlave::setDownstreamData(char* received) {
+  if (getCancel() || getReserve()) {
+    return;
+  }
+
   dd.parseAndUpdate(received);
 }
 

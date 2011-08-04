@@ -6,6 +6,7 @@
 #include <Wire.h>
 #include <Ethernet.h>
 
+#include "LongWireMaster.h"
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //mac address of master arduino
 byte ip[] = { 10, 0, 0, 2 }; //IP address of arduino
@@ -16,10 +17,13 @@ byte server[] = {10, 0, 0, 3 }; //Gabe's comp
 
 Client client(server, 3000);
 
+LongWireMaster wireMaster(109);
+
 void setup()
 {
 //  Serial.begin(9600);  //For debugging, take out eventually
-  Wire.begin(); //join bus as master
+//  Wire.begin(); //join bus as master
+  wireMaster.begin();
   Ethernet.begin(mac, ip, gateway, subnet);
   delay(1000);
 }
@@ -86,9 +90,9 @@ void loop()
 void sendDownstreamPacket(int id, char* message) {
   //Construct a one payload message.
 //  Serial.println("Sending response to slave");
-  Wire.beginTransmission(id);
-  Wire.send((byte*)message, 109);
-  Wire.endTransmission();
+  wireMaster.beginTransmission(id);
+  wireMaster.send((byte*)message, 109);
+  wireMaster.endTransmission();
 }
 
 //Parses http response and stores downstreampacket in message

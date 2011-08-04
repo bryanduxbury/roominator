@@ -1,8 +1,12 @@
+#include <LongWireMaster.h>
+#include <LongWireSlave.h>
+
 #include <Wire.h>
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
 
 #include <NetworkSlave.h>
+
 #include <DisplayController.h>
 #include <BounceButton.h>
 #include <string.h>
@@ -20,6 +24,8 @@ DisplayController dc(&lcd, &slave, fig[2], fig[1], fig[0]);
 
 BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
+
+LongWireSlave wireSlave(fig[11], 109, handleFullReceive, handleFullRequest);
 
 void setup() {
   Serial.begin(9600);
@@ -51,6 +57,19 @@ void handleRequest() {
   slave.clearCounts();
 }
 
+void handleFullRequest() {
+}
+
+
 void handleReceive(int numBytes) {
-  slave.handleReceive(numBytes);
+  wireSlave.onReceive(numBytes);
+}
+
+void handleFullReceive(int numBytes) {
+  char buf[109];
+  char* ptr = buf;
+  while (wireSlave.available()) {
+    (*ptr++) = (char)wireSlave.receive();
+  }
+  slave.setDownstreamData(buf);
 }

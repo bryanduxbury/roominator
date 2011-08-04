@@ -17,13 +17,10 @@ class NetworkSlave {
     char* getRoomName();
     void clearCounts();
 
-    void handleReceive(int numBytes);
-
   private:
     UpstreamData ud;
     DownstreamData dd;
 
-    void readFully(char* buf);
 };
 
 #endif

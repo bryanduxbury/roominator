@@ -1,10 +1,15 @@
 #include "LongWireMaster.h"
+#include "WProgram.h"
 
-LongWireMaster::LongWireMaster(size_t bufferSize) {
-  this->buffer = (byte*)malloc(bufferSize + 2) + 2;
+LongWireMaster::LongWireMaster(int bufferSize) {
+  this->buffer = (uint8_t*)malloc(bufferSize);
   this->capa = bufferSize;
-  this->off = 2;
+  this->off = 0;
   this->limit = 0;
+}
+
+void LongWireMaster::begin() {
+  Wire.begin();
 }
 
 void LongWireMaster::beginTransmission(int address) {
@@ -22,22 +27,22 @@ void LongWireMaster::send(char* str) {
   }
 }
 
-void LongWireMaster::send(byte* data, size_t size) {
+void LongWireMaster::send(uint8_t* data, int size) {
   for (int i = 0; i < size; i++) {
     send(*(data++));
   }
 }
 
 int LongWireMaster::endTransmission() {
-  this->off = 0;
-  buffer[0] = this->limit & 0xFF;
-  buffer[1] = (this->limit >> 8) & 0xFF;
+  off = 0;
+  uint8_t* tmpBuffer = buffer;
 
-  byte* tmpBuffer = buffer;
-
+  int frameNum = 0;
   while (off < limit) {
-    int toWrite = min(32, this->limit - this->off);
+    int toWrite = min(30, limit - off);
     Wire.beginTransmission(address);
+    Wire.send((byte)frameNum);
+    Wire.send((byte)toWrite);
     Wire.send(buffer, toWrite);
     int result = Wire.endTransmission();
     if (result != 0) {

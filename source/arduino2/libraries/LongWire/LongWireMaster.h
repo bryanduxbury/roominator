@@ -6,15 +6,18 @@
 
 class LongWireMaster {
 public:
-  LongWireMaster(size_t bufferSize);
+  LongWireMaster(int bufferSize);
+  void begin();
+
   void beginTransmission(int address);
-  void send(byte b);
+  void send(uint8_t b);
   void send(char* str);
-  void send(byte* data, size_t size);
+  void send(uint8_t* data, int size);
   int endTransmission();
 
 private:
-  byte* sendBuffer;
+  uint8_t* buffer;
+  int address;
   int off;
   int limit;
   int capa;
