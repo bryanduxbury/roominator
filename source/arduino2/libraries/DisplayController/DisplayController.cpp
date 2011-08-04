@@ -58,9 +58,8 @@ void DisplayController::setHigh(int displayColor) {
 }
 
 void DisplayController::draw() {
-  noInterrupts();
   int displayColor = GREEN;
-  Serial.println(slave->getNextReservation()->secs);
+
   // negative secs on next reservation means that there is no current reservation
   if (slave->getCurrentReservation()->secs > 0) {
     displayColor = RED;
@@ -73,10 +72,16 @@ void DisplayController::draw() {
 
   lcd->setCursor(0,0);
   lcd->print(slave->getRoomName());
-  lcd->setCursor(0,1);
-  lcd->print(slave->getCurrentReservation()->textLine1);
-  lcd->setCursor(0,2);
-  lcd->print(slave->getCurrentReservation()->textLine2);
+  if (slave->getCancel() || slave->getReserve()) {
+    lcd->setCursor(0,1);
+    lcd->print("cancel or reserve");
+  } else {
+    lcd->setCursor(0,1);
+    lcd->print(slave->getCurrentReservation()->textLine1);
+    lcd->setCursor(0,2);
+    lcd->print(slave->getCurrentReservation()->textLine2);
+  }
+  
 
   lcd->setCursor(0,3);
   char buttonBuffer[21];
@@ -92,8 +97,7 @@ void DisplayController::draw() {
   if (displayColor == RED) {
     // lcd->setCursor(13,3);
     // lcd->print("Cancel");
-    memcpy(buttonBuffer + 13, "Cancel", 6);
+    memcpy(buttonBuffer + 14, "Cancel", 6);
   }
   lcd->print(buttonBuffer);
-  interrupts();
 }

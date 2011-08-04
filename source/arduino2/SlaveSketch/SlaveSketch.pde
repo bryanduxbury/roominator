@@ -48,7 +48,7 @@ void loop() {
   }
 
   dc.draw();
-  delay(100);
+  delay(50);
 }
 
 void handleRequest() {
