@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110727214450) do
+ActiveRecord::Schema.define(:version => 20110809034122) do
 
   create_table "rooms", :force => true do |t|
     t.string   "calendar_name"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(:version => 20110727214450) do
     t.string   "calendar_id"
     t.integer  "reserved_button_presses"
     t.integer  "cancel_button_presses"
-    t.text     "current_event"
-    t.text     "next_event"
+    t.text     "current_event",           :default => ""
+    t.text     "next_event",              :default => ""
     t.text     "calendar"
   end
 

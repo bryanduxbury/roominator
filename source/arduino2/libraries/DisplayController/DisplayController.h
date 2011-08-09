@@ -31,5 +31,8 @@ private:
   int yellowPin;
   int greenPin;
 
+  unsigned long lastStateChangeMillis;
+  bool mainOrAlternate;
+
   void setHigh(int displayColor);
 };

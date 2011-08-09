@@ -49,6 +49,8 @@ void DisplayController::begin() {
   digitalWrite(yellowPin, LOW);
   digitalWrite(greenPin, LOW);
   lcd->clear();
+
+  lastStateChangeMillis = millis();
 }
 
 void DisplayController::setHigh(int displayColor) {
@@ -58,12 +60,17 @@ void DisplayController::setHigh(int displayColor) {
 }
 
 void DisplayController::draw() {
+  if (millis() - lastStateChangeMillis > 1000) {
+    mainOrAlternate = !mainOrAlternate;
+    lastStateChangeMillis = millis();
+  }
+
   int displayColor = GREEN;
 
   // negative secs on next reservation means that there is no current reservation
   if (slave->getCurrentReservation()->secs > 0) {
     displayColor = RED;
-  } else if ((slave->getNextReservation()->secs > 0) && (slave->getNextReservation()->secs < 60*15)) {
+  } else if ((slave->getCurrentReservation()->secs < 0) && (slave->getCurrentReservation()->secs > -60*15)) {
     // the next reservation is less than 15 minutes away, so light the yellow LED
     displayColor = YELLOW;
   }
@@ -72,16 +79,21 @@ void DisplayController::draw() {
 
   lcd->setCursor(0,0);
   lcd->print(slave->getRoomName());
+
   if (slave->getCancel() || slave->getReserve()) {
     lcd->setCursor(0,1);
     lcd->print("cancel or reserve");
   } else {
-    lcd->setCursor(0,1);
-    lcd->print(slave->getCurrentReservation()->textLine1);
-    lcd->setCursor(0,2);
-    lcd->print(slave->getCurrentReservation()->textLine2);
+    if (mainOrAlternate) {
+      lcd->setCursor(0,1);
+      lcd->print(slave->getCurrentReservation()->textLine1);
+      lcd->setCursor(0,2);
+      lcd->print(slave->getCurrentReservation()->textLine2);
+    } else {
+      lcd->setCursor(0,1);
+      lcd->print("Reserved by someone");
+    }
   }
-  
 
   lcd->setCursor(0,3);
   char buttonBuffer[21];
@@ -95,8 +107,6 @@ void DisplayController::draw() {
   }
 
   if (displayColor == RED) {
-    // lcd->setCursor(13,3);
-    // lcd->print("Cancel");
     memcpy(buttonBuffer + 14, "Cancel", 6);
   }
   lcd->print(buttonBuffer);

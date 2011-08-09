@@ -43,10 +43,6 @@ Reservation* NetworkSlave::getCurrentReservation() {
   return dd.getCurrentReservation();
 }
 
-Reservation* NetworkSlave::getNextReservation() {
-  return dd.getNextReservation();
-}
-
 void NetworkSlave::clearCounts() {
   ud.setReserve(0);
   ud.setCancel(false);

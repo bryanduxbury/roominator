@@ -4,6 +4,8 @@
 struct Reservation {
   char textLine1[21];
   char textLine2[21];
+  char altTextLine1[21];
+  char altTextLine2[21];
   short secs;
 };
 
@@ -15,12 +17,10 @@ class DownstreamData {
 
     char* getRoomName();
     Reservation* getCurrentReservation();
-    Reservation* getNextReservation();
 
   private:
     char roomName[21];
     Reservation currentReservation;
-    Reservation nextReservation;
 };
 
 #endif

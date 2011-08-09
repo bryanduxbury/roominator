@@ -12,6 +12,17 @@ class RoomController < ApplicationController
 
   @@x = 0;
 
+  def split_across_lines(str)
+    if str.size > 20
+      20.downto(15) do |i|
+        if str[i..i] == " "
+          return [str[0..(i-1)], str[(i+1)..(i+20)]]
+        end
+      end
+    end
+    [str[0..20], str[20..40]]
+  end
+
   # gives slave id, reserved_button_presses, cancel_button_presses
   # returns current information
   def report
@@ -20,7 +31,12 @@ class RoomController < ApplicationController
     new_reserved_button_presses = params[:rsv].to_i
     new_cancel_button_presses   = params[:cancel].to_i
 
-    data = [200, current_room.room_name[0..20], 0, "r1 line 1", 0, "r1 line 2", 0, 0, "r2 line1", 0, "r2 line2", 0, 10].pack("CA20CA20CA20CvA20CA20Cv")
+    room_name = current_room.room_name[0..20]
+    current_res_string1, current_res_string2 = split_across_lines(current_room.current_event)
+
+    next_res_string1, next_res_string2 = split_across_lines(current_room.next_event)
+
+    data = [200, current_room.room_name[0..20], 0, current_res_string1, 0, current_res_string2, 0, next_res_string1, 0, next_res_string2, 0, -600].pack("CA20CA20CA20CA20CA20Cv")
     puts data.length
     puts data.inspect
 
