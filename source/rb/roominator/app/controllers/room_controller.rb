@@ -41,7 +41,7 @@ class RoomController < ApplicationController
     new_reserved_button_presses = params[:rsv].to_i
     new_cancel_button_presses   = params[:cancel].to_i
 
-    room_name = current_room.room_name[0..20]
+    room_name = current_room.room_name.center(20, " ")
 
     reserved_at = Time.at(current_room.next_reservation_at)
     puts Time.now
@@ -74,7 +74,7 @@ class RoomController < ApplicationController
 
     end
 
-    data = [200, current_room.room_name[0..20], 0,
+    data = [200, room_name, 0,
       msg1Line1, 0, msg1Line2, 0,
       msg2Line1, 0, msg2Line2, 0,
       msg3Line1, 0, msg3Line2, 0,
