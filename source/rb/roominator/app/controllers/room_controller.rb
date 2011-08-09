@@ -2,9 +2,19 @@ require "ruby-debug"
 class RoomController < ApplicationController
 
   OVERFLOW_VALUE = 255
-  STATUS_GREEN = 0
-  STATUS_YELLOW = 1
-  STATUS_RED = 2
+  
+  LED_NONE = 0
+  LED_RED = 1
+  LED_YELLOW = 2
+  LED_GREEN = 3
+
+  LBUTTON_DISABLED = 1
+  LBUTTON_RESERVE = 2
+  LBUTTON_EXTEND = 3
+
+  RBUTTON_ENABLED = 1
+  RBUTTON_DISABLED = 2
+
 
   def index
     @rooms = Room.all
@@ -33,21 +43,44 @@ class RoomController < ApplicationController
 
     room_name = current_room.room_name[0..20]
 
-    # reserved_at = Time.at(current_room.reserved_at)
-    # 
-    # Time.now.to_i - reserved_at.to_i
+    reserved_at = Time.at(current_room.next_reservation_at)
+    puts Time.now
+    puts reserved_at
+    time_until_next_reservation = Time.now.to_i - reserved_at.to_i
+    puts time_until_next_reservation
+    lbutton = LBUTTON_DISABLED;
+    rbutton = RBUTTON_DISABLED;
+    led = LED_NONE;
 
-    msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
-    msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
-    msg3Line1, msg3Line2 = split_across_lines("Until 3:30")
+    if time_until_next_reservation > 0
+      # reservation is currently happening
+      msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
+      msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
+      msg3Line1, msg3Line2 = split_across_lines("Until #{(Time.now + current_room.reservation_duration_secs).strftime("%I:%M%p %m/%d")}")
+      led = LED_RED
+      rbutton = RBUTTON_ENABLED
+      lbutton = LBUTTON_EXTEND
+    else
+      # reservation is for a future date
+      msg1Line1, msg1Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
+      msg2Line1, msg2Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
+      msg3Line1, msg3Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
+      if (time_until_next_reservation > -15*60)
+        led = LED_YELLOW
+      else
+        led = LED_GREEN
+        lbutton = LBUTTON_RESERVE
+      end
+
+    end
 
     data = [200, current_room.room_name[0..20], 0,
       msg1Line1, 0, msg1Line2, 0,
       msg2Line1, 0, msg2Line2, 0,
       msg3Line1, 0, msg3Line2, 0,
-      2,
-      1,
-      2].pack("C" + ("A20C" * 7) + "CCC")
+      lbutton,
+      rbutton,
+      led].pack("C" + ("A20C" * 7) + "CCC")
     puts data.length
     puts data.inspect
 
