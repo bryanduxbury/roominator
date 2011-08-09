@@ -3,12 +3,6 @@
 #include "WProgram.h"
 #include "NetworkSlave.h"
 
-enum DisplayColor {
-  GREEN,
-  YELLOW,
-  RED
-};
-
 class DisplayController {
 public:
   DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin);

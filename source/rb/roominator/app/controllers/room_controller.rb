@@ -33,6 +33,10 @@ class RoomController < ApplicationController
 
     room_name = current_room.room_name[0..20]
 
+    # reserved_at = Time.at(current_room.reserved_at)
+    # 
+    # Time.now.to_i - reserved_at.to_i
+
     msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
     msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
     msg3Line1, msg3Line2 = split_across_lines("Until 3:30")
@@ -41,7 +45,9 @@ class RoomController < ApplicationController
       msg1Line1, 0, msg1Line2, 0,
       msg2Line1, 0, msg2Line2, 0,
       msg3Line1, 0, msg3Line2, 0,
-      -600].pack("C" + ("A20C" * 7) + "v")
+      2,
+      1,
+      2].pack("C" + ("A20C" * 7) + "CCC")
     puts data.length
     puts data.inspect
 

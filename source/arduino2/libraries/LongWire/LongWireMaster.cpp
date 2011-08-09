@@ -43,7 +43,11 @@ int LongWireMaster::endTransmission() {
   uint8_t* tmpBuffer = buffer;
 
   int frameNum = 0;
-  while (off < limit) {
+  // special hack here: if the message size just happens to be an integral 
+  // number of packets, we have to send a final packet of size zero to cap
+  // things off.
+  // TODO: this could definitely be better. redo this at some point.
+  while (off < limit+1) {
     int toWrite = min(30, limit - off);
     Wire.beginTransmission(address);
     Wire.send((byte)frameNum);

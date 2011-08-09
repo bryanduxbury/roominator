@@ -12,8 +12,7 @@ class NetworkSlave {
     void cancel();
     int getReserve();
     int getCancel();
-    Reservation* getCurrentReservation();
-    char* getRoomName();
+    DownstreamDataStruct* getDownstreamData();
     void clearCounts();
 
   private:

@@ -7,6 +7,7 @@
 #include <Ethernet.h>
 
 #include "LongWireMaster.h"
+#include "DownstreamData.h"
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //mac address of master arduino
 byte ip[] = { 10, 0, 0, 2 }; //IP address of arduino
@@ -17,7 +18,7 @@ byte server[] = {10, 0, 0, 3 }; //Gabe's comp
 
 Client client(server, 3000);
 
-LongWireMaster wireMaster(149);
+LongWireMaster wireMaster(sizeof(DownstreamDataStruct));
 
 void setup()
 {
@@ -71,7 +72,7 @@ void loop()
 
       Serial.println("Got response from server");
 
-      char response[149];
+      char response[sizeof(DownstreamDataStruct)];
       parseHttpResponse(response);
 //      for (int i = 0; i < 109; i++) {
 //        Serial.println((int)response[i]);
@@ -91,14 +92,14 @@ void sendDownstreamPacket(int id, char* message) {
   //Construct a one payload message.
 //  Serial.println("Sending response to slave");
   wireMaster.beginTransmission(id);
-  wireMaster.send((byte*)message, 149);
+  wireMaster.send((byte*)message, sizeof(DownstreamDataStruct));
   wireMaster.endTransmission();
 }
 
 //Parses http response and stores downstreampacket in message
 void parseHttpResponse(char* message) {
   throwAwayHeader();
-  for (int i = 0; i < 149 && client.available(); i++) {
+  for (int i = 0; i < sizeof(DownstreamDataStruct) && client.available(); i++) {
     *message = (char) client.read();
     message++;
   }

@@ -39,15 +39,11 @@ void NetworkSlave::cancel() {
   }
 }
 
-Reservation* NetworkSlave::getCurrentReservation() {
+DownstreamDataStruct* NetworkSlave::getDownstreamData() {
   return dd.getCurrentReservation();
 }
 
 void NetworkSlave::clearCounts() {
   ud.setReserve(0);
   ud.setCancel(false);
-}
-
-char* NetworkSlave::getRoomName() {
-  return dd.getRoomName();
 }
