@@ -17,7 +17,7 @@ byte server[] = {10, 0, 0, 3 }; //Gabe's comp
 
 Client client(server, 3000);
 
-LongWireMaster wireMaster(109);
+LongWireMaster wireMaster(149);
 
 void setup()
 {
@@ -71,7 +71,7 @@ void loop()
 
       Serial.println("Got response from server");
 
-      char response[109];
+      char response[149];
       parseHttpResponse(response);
 //      for (int i = 0; i < 109; i++) {
 //        Serial.println((int)response[i]);
@@ -91,14 +91,14 @@ void sendDownstreamPacket(int id, char* message) {
   //Construct a one payload message.
 //  Serial.println("Sending response to slave");
   wireMaster.beginTransmission(id);
-  wireMaster.send((byte*)message, 109);
+  wireMaster.send((byte*)message, 149);
   wireMaster.endTransmission();
 }
 
 //Parses http response and stores downstreampacket in message
 void parseHttpResponse(char* message) {
   throwAwayHeader();
-  for (int i = 0; i < 109 && client.available(); i++) {
+  for (int i = 0; i < 149 && client.available(); i++) {
     *message = (char) client.read();
     message++;
   }

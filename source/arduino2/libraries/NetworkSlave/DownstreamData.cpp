@@ -5,14 +5,19 @@
 
 DownstreamData::DownstreamData() {
   strcpy(roomName,                     "  waiting to sync   ");
-  strcpy(currentReservation.textLine1, "                    ");
-  currentReservation.textLine1[20] = '\0';
-  strcpy(currentReservation.textLine2, "                    ");
-  currentReservation.textLine2[20] = '\0';
-  strcpy(currentReservation.altTextLine1, "                    ");
-  currentReservation.altTextLine1[20] = '\0';
-  strcpy(currentReservation.altTextLine2, "                    ");
-  currentReservation.altTextLine2[20] = '\0';
+  strcpy(currentReservation.msg1Line1, "                    ");
+  currentReservation.msg1Line1[20] = '\0';
+  strcpy(currentReservation.msg1Line2, "                    ");
+  currentReservation.msg1Line2[20] = '\0';
+  strcpy(currentReservation.msg2Line1, "                    ");
+  currentReservation.msg2Line1[20] = '\0';
+  strcpy(currentReservation.msg2Line2, "                    ");
+  currentReservation.msg2Line2[20] = '\0';
+  strcpy(currentReservation.msg3Line1, "                    ");
+  currentReservation.msg3Line1[20] = '\0';
+  strcpy(currentReservation.msg3Line2, "                    ");
+  currentReservation.msg3Line2[20] = '\0';
+
   currentReservation.secs = 0;
 }
 

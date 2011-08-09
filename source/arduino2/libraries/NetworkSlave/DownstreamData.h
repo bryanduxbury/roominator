@@ -2,10 +2,12 @@
 #define DownstreamData_h
 
 struct Reservation {
-  char textLine1[21];
-  char textLine2[21];
-  char altTextLine1[21];
-  char altTextLine2[21];
+  char msg1Line1[21];
+  char msg1Line2[21];
+  char msg2Line1[21];
+  char msg2Line2[21];
+  char msg3Line1[21];
+  char msg3Line2[21];
   short secs;
 };
 

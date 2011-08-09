@@ -60,8 +60,8 @@ void DisplayController::setHigh(int displayColor) {
 }
 
 void DisplayController::draw() {
-  if (millis() - lastStateChangeMillis > 1000) {
-    mainOrAlternate = !mainOrAlternate;
+  if (millis() - lastStateChangeMillis > 1500) {
+    msgNum++;
     lastStateChangeMillis = millis();
   }
 
@@ -84,14 +84,21 @@ void DisplayController::draw() {
     lcd->setCursor(0,1);
     lcd->print("cancel or reserve");
   } else {
-    if (mainOrAlternate) {
+    if (msgNum % 3 == 0) {
       lcd->setCursor(0,1);
-      lcd->print(slave->getCurrentReservation()->textLine1);
+      lcd->print(slave->getCurrentReservation()->msg1Line1);
       lcd->setCursor(0,2);
-      lcd->print(slave->getCurrentReservation()->textLine2);
+      lcd->print(slave->getCurrentReservation()->msg1Line2);
+    } else if (msgNum % 3 == 1) {
+      lcd->setCursor(0,1);
+      lcd->print(slave->getCurrentReservation()->msg2Line1);
+      lcd->setCursor(0,2);
+      lcd->print(slave->getCurrentReservation()->msg2Line2);
     } else {
       lcd->setCursor(0,1);
-      lcd->print("Reserved by someone");
+      lcd->print(slave->getCurrentReservation()->msg3Line1);
+      lcd->setCursor(0,2);
+      lcd->print(slave->getCurrentReservation()->msg3Line2);
     }
   }
 

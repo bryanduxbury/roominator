@@ -14,7 +14,7 @@ class RoomController < ApplicationController
 
   def split_across_lines(str)
     if str.size > 20
-      20.downto(15) do |i|
+      20.downto(12) do |i|
         if str[i..i] == " "
           return [str[0..(i-1)], str[(i+1)..(i+20)]]
         end
@@ -32,11 +32,16 @@ class RoomController < ApplicationController
     new_cancel_button_presses   = params[:cancel].to_i
 
     room_name = current_room.room_name[0..20]
-    current_res_string1, current_res_string2 = split_across_lines(current_room.current_event)
 
-    next_res_string1, next_res_string2 = split_across_lines(current_room.next_event)
+    msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
+    msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
+    msg3Line1, msg3Line2 = split_across_lines("Until 3:30")
 
-    data = [200, current_room.room_name[0..20], 0, current_res_string1, 0, current_res_string2, 0, next_res_string1, 0, next_res_string2, 0, -600].pack("CA20CA20CA20CA20CA20Cv")
+    data = [200, current_room.room_name[0..20], 0,
+      msg1Line1, 0, msg1Line2, 0,
+      msg2Line1, 0, msg2Line2, 0,
+      msg3Line1, 0, msg3Line2, 0,
+      -600].pack("C" + ("A20C" * 7) + "v")
     puts data.length
     puts data.inspect
 

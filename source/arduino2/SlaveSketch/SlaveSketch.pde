@@ -25,7 +25,7 @@ DisplayController dc(&lcd, &slave, fig[2], fig[1], fig[0]);
 BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
 
-LongWireSlave wireSlave(fig[11], 109, handleFullReceive, handleFullRequest);
+LongWireSlave wireSlave(fig[11], 149, handleFullReceive, handleFullRequest);
 
 void setup() {
   Serial.begin(115200);
@@ -71,7 +71,7 @@ void handleReceive(int numBytes) {
 void handleFullReceive(int numBytes) {
   Serial.print("handleFullReceive with ");
   Serial.println(numBytes);
-  char buf[109];
+  char buf[149];
   char* ptr = buf;
   int i = 0;
   while (wireSlave.available()) {

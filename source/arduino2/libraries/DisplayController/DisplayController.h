@@ -32,7 +32,7 @@ private:
   int greenPin;
 
   unsigned long lastStateChangeMillis;
-  bool mainOrAlternate;
+  int msgNum;
 
   void setHigh(int displayColor);
 };
