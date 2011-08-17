@@ -13,10 +13,10 @@
 
 // [GreenPin, YellowPin, RedPin, ResPin, CancelPin, LCD1, LCD2, LCD3, LCD4, LCD5, LCD6, I2CAddress]
 //Junior
-int fig[] = {4,3,2,6,5,8,9,10,11,12,13,1};
+//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,1};
 
 //Senior 
-//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
+int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
 
 NetworkSlave slave;
 LiquidCrystal lcd(fig[5], fig[6], fig[7], fig[8], fig[9], fig[10]);

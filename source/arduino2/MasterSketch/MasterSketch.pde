@@ -10,11 +10,11 @@
 #include "DownstreamData.h"
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //mac address of master arduino
-byte ip[] = { 10, 0, 0, 2 }; //IP address of arduino
-byte gateway[] = { 10, 0, 0, 1 }; //IP address of router in office
-byte subnet[] = { 255, 255, 255, 0 }; //subnet mask of office network
+byte ip[] = { 10, 99, 33, 128 }; 
+byte gateway[] = { 10, 99, 33, 1 }; 
+byte subnet[] = { 255, 255, 254, 0 };
 
-byte server[] = {10, 0, 0, 3 }; //Gabe's comp
+byte server[] = {10, 99, 32, 33}; //Gabe's comp
 
 Client client(server, 3000);
 
@@ -38,7 +38,7 @@ void loop()
   delay(1000);
 
   //Loop over addresses 1 thru 9
-  for(int i = 1; i < 2; i++) {
+  for(int i = 1; i < 10; i++) {
     Serial.println("before");
     Wire.requestFrom(i, 1); //request 1 bytes from slave
     Serial.println("after");
