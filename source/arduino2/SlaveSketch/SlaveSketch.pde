@@ -16,7 +16,11 @@
 //int fig[] = {4,3,2,6,5,8,9,10,11,12,13,1};
 
 //Senior 
-int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
+//int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
+
+//Nuevo
+int fig[] = {6,5,4,3,2,13,12,11,10,9,8,3};
+
 
 NetworkSlave slave;
 LiquidCrystal lcd(fig[5], fig[6], fig[7], fig[8], fig[9], fig[10]);

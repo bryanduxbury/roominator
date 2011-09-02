@@ -18,6 +18,11 @@ void DisplayController::begin() {
   pinMode(yellowPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
 
+  digitalWrite(redPin, HIGH);
+  digitalWrite(yellowPin, HIGH);
+  digitalWrite(greenPin, HIGH);
+
+
   lcd->begin(20, 4);
   // display the self-test
   lcd->clear();
@@ -30,29 +35,29 @@ void DisplayController::begin() {
   lcd->setCursor(0,3);
   lcd->print("####################");
 
-  digitalWrite(redPin, HIGH);
+  digitalWrite(redPin, LOW);
   delay(750);
-  digitalWrite(yellowPin, HIGH);
+  digitalWrite(yellowPin, LOW);
   delay(750);
-  digitalWrite(greenPin, HIGH);
+  digitalWrite(greenPin, LOW);
 
   lcd->setCursor(0,2);
   lcd->print("#     COMPLETE!    #");
 
   delay(2000);
 
-  digitalWrite(redPin, LOW);
-  digitalWrite(yellowPin, LOW);
-  digitalWrite(greenPin, LOW);
+  digitalWrite(redPin, HIGH);
+  digitalWrite(yellowPin, HIGH);
+  digitalWrite(greenPin, HIGH);
   lcd->clear();
 
   lastStateChangeMillis = millis();
 }
 
 void DisplayController::setHigh(int displayColor) {
-  digitalWrite(redPin, (displayColor == LED_RED) ? HIGH : LOW);
-  digitalWrite(yellowPin, (displayColor == LED_YELLOW) ? HIGH : LOW);
-  digitalWrite(greenPin, (displayColor == LED_GREEN) ? HIGH : LOW);
+  digitalWrite(redPin, (displayColor == LED_RED) ? LOW : HIGH);
+  digitalWrite(yellowPin, (displayColor == LED_YELLOW) ? LOW : HIGH);
+  digitalWrite(greenPin, (displayColor == LED_GREEN) ? LOW : HIGH);
 }
 
 void DisplayController::draw() {
