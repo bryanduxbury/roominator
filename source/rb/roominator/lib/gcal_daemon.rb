@@ -1,11 +1,12 @@
 class GcalDaemon
-  def initialize(email, password)
+  def initialize(email, password, sleep_time)
     @cal_service = GCal4Ruby::Service.new
     @cal_service.authenticate(email, password)
+    @sleep_time = sleep_time
   end
 
   def run
-    # while true
+    while true
       Room.find(:all).each do |room|
         puts "working on room #{room.room_name}"
         if cal = @cal_service.calendars.find{|c| CGI.unescape(c.id) == room.calendar_id}
@@ -26,12 +27,12 @@ class GcalDaemon
           end
         end
       end
-      # sleep 10000
-    # end
+      sleep @sleep_time.to_f/1000
+    end
   end
 end
 
 if $0 == __FILE__
   require "config/environment.rb"
-  GcalDaemon.new(ARGV.shift, ARGV.shift).run
+  GcalDaemon.new(ARGV.shift, ARGV.shift, ARGV.shift.to_i).run
 end
