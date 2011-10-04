@@ -2,10 +2,11 @@
 
 #include "WProgram.h"
 #include "NetworkSlave.h"
+#include <BounceButton.h>
 
 class DisplayController {
 public:
-  DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin);
+  DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin, BounceButton* reserveButton, BounceButton* cancelButton);
 
   void onPressReserveOrExtend();
   void onPressCancel();
@@ -18,6 +19,8 @@ public:
 private:
   LiquidCrystal* lcd;
   NetworkSlave* slave;
+  BounceButton* reserveButton;
+  BounceButton* cancelButton;
 
   char _displayName[21];
 
@@ -29,4 +32,6 @@ private:
   int msgNum;
 
   void setHigh(int displayColor);
+  void setOrResetDeviceId();
+  int getId();
 };

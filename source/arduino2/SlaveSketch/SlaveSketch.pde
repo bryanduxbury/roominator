@@ -23,11 +23,12 @@ int fig[] = {6,5,4,3,2,13,12,11,10,9,8,3};
 
 
 NetworkSlave slave;
-LiquidCrystal lcd(fig[5], fig[6], fig[7], fig[8], fig[9], fig[10]);
-DisplayController dc(&lcd, &slave, fig[2], fig[1], fig[0]);
-
 BounceButton reserve(fig[3]);
 BounceButton cancel(fig[4]);
+
+LiquidCrystal lcd(fig[5], fig[6], fig[7], fig[8], fig[9], fig[10]);
+DisplayController dc(&lcd, &slave, fig[2], fig[1], fig[0], &reserve, &cancel);
+
 
 LongWireSlave wireSlave(fig[11], sizeof(DownstreamDataStruct), handleFullReceive, handleFullRequest);
 
@@ -37,7 +38,7 @@ void setup() {
   reserve.initialize();
   cancel.initialize();
   
-  Wire.begin(fig[11]);
+//  Wire.begin(fig[11]);
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
 }

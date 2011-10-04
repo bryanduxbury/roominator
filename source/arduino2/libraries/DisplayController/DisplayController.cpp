@@ -3,14 +3,19 @@
 #include <LiquidCrystal.h>
 #include "WProgram.h"
 #include <DisplayController.h>
+#include <EEPRom.h>
+#include <Wire.h>
+
 using namespace std;
 
-DisplayController::DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin) {
+DisplayController::DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin, BounceButton* reserveButton, BounceButton* cancelButton) {
   this->lcd = lcd;
   this->slave = slave;
   this->redPin = redPin;
   this->yellowPin = yellowPin;
   this->greenPin = greenPin;
+  this->reserveButton = reserveButton;
+  this->cancelButton = cancelButton;
 }
 
 void DisplayController::begin() {
@@ -50,6 +55,10 @@ void DisplayController::begin() {
   digitalWrite(yellowPin, HIGH);
   digitalWrite(greenPin, HIGH);
   lcd->clear();
+
+  setOrResetDeviceId();
+
+
 
   lastStateChangeMillis = millis();
 }
@@ -108,4 +117,58 @@ void DisplayController::draw() {
     memcpy(buttonBuffer + 14, "Cancel", 6);
   }
   lcd->print(buttonBuffer);
+}
+
+void DisplayController::setOrResetDeviceId() {
+  int deviceId = EEPROM.read(0);
+  lcd->setCursor(0,0);
+  if (deviceId == 0) {
+    lcd->print("No Display ID set.");
+    delay(2000);
+    deviceId = getId();
+  } else {
+    lcd->print("Current Display ID:");
+    lcd->print(deviceId);
+    lcd->setCursor(0,1);
+    lcd->print("Press and hold both");
+    lcd->setCursor(0,2);
+    lcd->print("buttons to change");
+
+    for (int i = 0; i < 40; i++) {
+      if (reserveButton->check() && cancelButton->check()) {
+        deviceId = getId();
+        break;
+      }
+    }
+  }
+
+  // store the device id back into the eeprom
+  EEPROM.write(0, deviceId);
+
+  // boot up the i2c interface with the provided device ID
+  Wire.begin(deviceId);
+}
+
+int DisplayController::getId() {
+  lcd->clear();
+  lcd->setCursor(0,0);
+  lcd->print("Current value:");
+  lcd->setCursor(0,3);
+  lcd->print("Increment     Accept");
+
+  int deviceId = 1;
+  while (true) {
+    if (reserveButton->check()) {
+      deviceId++;
+      if (deviceId == 33) {
+        deviceId = 1;
+      }
+    }
+    if (cancelButton->check()) {
+      break;
+    }
+    lcd->setCursor(0,1);
+    lcd->print(deviceId);
+  }
+  return deviceId;
 }
