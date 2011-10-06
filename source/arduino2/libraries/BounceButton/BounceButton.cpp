@@ -8,8 +8,8 @@
 BounceButton::BounceButton(int pin_number) {
   pin = pin_number;
   currentState;
-  lastState = LOW;
-  lastSavedState = LOW;
+  lastState = HIGH;
+  lastSavedState = HIGH;
   lastDebounceTime = 0;
 }
 
