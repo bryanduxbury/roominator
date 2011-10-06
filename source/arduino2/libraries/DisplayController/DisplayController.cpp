@@ -8,7 +8,14 @@
 
 using namespace std;
 
-DisplayController::DisplayController(LiquidCrystal* lcd, NetworkSlave* slave, int redPin, int yellowPin, int greenPin, BounceButton* reserveButton, BounceButton* cancelButton) {
+DisplayController::DisplayController(LiquidCrystal* lcd,
+                                      NetworkSlave* slave,
+                                      int redPin,
+                                      int yellowPin,
+                                      int greenPin,
+                                      BounceButton* reserveButton,
+                                      BounceButton* cancelButton)
+{
   this->lcd = lcd;
   this->slave = slave;
   this->redPin = redPin;
@@ -57,8 +64,6 @@ void DisplayController::begin() {
   lcd->clear();
 
   setOrResetDeviceId();
-
-
 
   lastStateChangeMillis = millis();
 }
@@ -122,23 +127,39 @@ void DisplayController::draw() {
 void DisplayController::setOrResetDeviceId() {
   int deviceId = EEPROM.read(0);
   lcd->setCursor(0,0);
+
   if (deviceId == 0) {
     lcd->print("No Display ID set.");
     delay(2000);
     deviceId = getId();
   } else {
-    lcd->print("Current Display ID:");
-    lcd->print(deviceId);
-    lcd->setCursor(0,1);
-    lcd->print("Press and hold both");
-    lcd->setCursor(0,2);
-    lcd->print("buttons to change");
+    long startMillis = millis();
+    
+    while(true) {
+      long curMillis = millis();
+      if (curMillis - startMillis > 6000) {
+        break;
+      }
 
-    for (int i = 0; i < 40; i++) {
-      if (reserveButton->check() && cancelButton->check()) {
+      lcd->setCursor(0,0);
+      lcd->print("Current ID: ");
+      lcd->print(deviceId);
+      lcd->setCursor(0,1);
+      lcd->print("Press and hold both ");
+      lcd->setCursor(0,2);
+      lcd->print("buttons in the next ");
+      lcd->setCursor(0,3);
+      lcd->print((5000 - (curMillis-startMillis)) / 1000);
+      lcd->print(" secs to change");
+      
+      
+      bool res = reserveButton->check();
+      bool can = cancelButton->check();
+      if (res && can) {
         deviceId = getId();
         break;
       }
+      delay(10);
     }
   }
 
@@ -147,6 +168,8 @@ void DisplayController::setOrResetDeviceId() {
 
   // boot up the i2c interface with the provided device ID
   Wire.begin(deviceId);
+
+  lcd->clear();
 }
 
 int DisplayController::getId() {
@@ -155,20 +178,31 @@ int DisplayController::getId() {
   lcd->print("Current value:");
   lcd->setCursor(0,3);
   lcd->print("Increment     Accept");
+  while(reserveButton->check() || cancelButton->check()){delay(100);}
 
   int deviceId = 1;
+  int i = 0;
   while (true) {
+    i++;
     if (reserveButton->check()) {
       deviceId++;
       if (deviceId == 33) {
         deviceId = 1;
       }
+      while(reserveButton->check()){}
     }
     if (cancelButton->check()) {
       break;
     }
     lcd->setCursor(0,1);
     lcd->print(deviceId);
+    delay(10);
   }
+  lcd->setCursor(0,2);
+  lcd->print("      Accepted!     ");
+  lcd->setCursor(0,3);
+  lcd->print("                    ");
+  delay(2000);
+  
   return deviceId;
 }

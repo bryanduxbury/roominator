@@ -9,9 +9,11 @@ class BounceButton {
 		int getLastState();
 		int getTime();
 		bool check();
+
+		int pin;
 		
 	private:
-		int pin;
+
 		int currentState;
 		int lastState;
 		int lastSavedState;

@@ -19,7 +19,7 @@
 //int fig[] = {4,3,2,6,5,8,9,10,11,12,13,2};
 
 //Nuevo
-int fig[] = {6,5,4,3,2,13,12,11,10,9,8,3};
+int fig[] = {6,5,4,2,3,13,12,11,10,9,8,3};
 
 
 NetworkSlave slave;
@@ -34,11 +34,11 @@ LongWireSlave wireSlave(fig[11], sizeof(DownstreamDataStruct), handleFullReceive
 
 void setup() {
   Serial.begin(115200);
-  dc.begin();
   reserve.initialize();
   cancel.initialize();
-  
-//  Wire.begin(fig[11]);
+  dc.begin();
+
+
   Wire.onReceive(handleReceive);
   Wire.onRequest(handleRequest);
 }
