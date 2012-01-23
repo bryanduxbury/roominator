@@ -1,32 +1,227 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
+#include <EEPROM.h>
+#include <BounceButton.h>
 
-struct MasterSlaveMessage {
-  char message1L1[21];
-  char message1L2[21];
-};
+#define ROOM_NAME 0
+char roomName[21];
+
+#define MESSAGE1L1 1
+#define MESSAGE1L2 2
+#define MESSAGE2L1 3
+#define MESSAGE2L2 4
+#define MESSAGE3L1 5
+#define MESSAGE3L2 6
+
+char message1L1[21];
+char message1L2[21];
+char message2L1[21];
+char message2L2[21];
+char message3L1[21];
+char message3L2[21];
+
+#define FLAGS 7
+
+#define LBUTTON_DISABLED 1
+#define LBUTTON_RESERVE 2
+#define LBUTTON_EXTEND 3
+
+#define LBUTTON_MASK 0x03
+int lbutton_status = LBUTTON_DISABLED;
+
+#define RBUTTON_MASK 0x04
+#define RBUTTON_ENABLED 1
+#define RBUTTON_DISABLED 2
+int rbutton_status = RBUTTON_DISABLED;
+
+#define LED_NONE 0
+#define LED_RED 1
+#define LED_YELLOW 2
+#define LED_GREEN 3
+
+#define LED_MASK 0x18
+int statusLed = LED_NONE;
 
 unsigned int counter = 0;
 
-char message[21];
-
 LiquidCrystal lcd(13,12,11,10,9,8);
 
+#define RED_PIN 4
+#define YELLOW_PIN 5
+#define GREEN_PIN 6
+
+#define LBUTTON_PIN 2
+#define RBUTTON_PIN 3
+BounceButton lButton(LBUTTON_PIN);
+BounceButton rButton(RBUTTON_PIN);
+
 void setup() {
+  lButton.initialize();
+  rButton.initialize();
+  
+  pinMode(RED_PIN, OUTPUT);
+  pinMode(YELLOW_PIN, OUTPUT);
+  pinMode(GREEN_PIN, OUTPUT);
+  digitalWrite(RED_PIN, HIGH);
+  digitalWrite(YELLOW_PIN, HIGH);
+  digitalWrite(GREEN_PIN, HIGH);
+
   lcd.begin(20,4);
-  lcd.setCursor(0, 0);
-  lcd.print("Hello world!");
+  post();
+  
+  setOrResetDeviceId();
   
   Wire.begin(1);
   Wire.onRequest(requestHandler);
   Wire.onReceive(receiveHandler);
 }
 
+void post() {
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("####################");
+  lcd.setCursor(0,1);
+  lcd.print("#     SELF TEST    #");
+  lcd.setCursor(0,2);
+  lcd.print("#                  #");
+  lcd.setCursor(0,3);
+  lcd.print("####################");
+
+  digitalWrite(RED_PIN, LOW);
+  delay(750);
+  digitalWrite(YELLOW_PIN, LOW);
+  delay(750);
+  digitalWrite(GREEN_PIN, LOW);
+
+  lcd.setCursor(0,2);
+  lcd.print("#     COMPLETE!    #");
+
+  delay(2000);
+
+  digitalWrite(RED_PIN, HIGH);
+  digitalWrite(YELLOW_PIN, HIGH);
+  digitalWrite(GREEN_PIN, HIGH);
+  lcd.clear();
+}
+
+void setOrResetDeviceId() {
+  int deviceId = EEPROM.read(0);
+  lcd.setCursor(0,0);
+
+  if (deviceId == 0) {
+    lcd.print("No Display ID set.");
+    delay(2000);
+    deviceId = getId();
+  } else {
+    long startMillis = millis();
+    
+    while(true) {
+      long curMillis = millis();
+      if (curMillis - startMillis > 6000) {
+        break;
+      }
+
+      lcd.setCursor(0,0);
+      lcd.print("Current ID: ");
+      lcd.print(deviceId);
+      lcd.setCursor(0,1);
+      lcd.print("Press and hold both ");
+      lcd.setCursor(0,2);
+      lcd.print("buttons in the next ");
+      lcd.setCursor(0,3);
+      lcd.print((5000 - (curMillis-startMillis)) / 1000);
+      lcd.print(" secs to change");
+      
+      
+      bool res = lButton.check();
+      bool can = rButton.check();
+      if (res && can) {
+        deviceId = getId();
+        break;
+      }
+      delay(10);
+    }
+  }
+
+  // store the device id back into the eeprom
+  EEPROM.write(0, deviceId);
+
+  // boot up the i2c interface with the provided device ID
+  Wire.begin(deviceId);
+
+  lcd.clear();
+}
+
+int getId() {
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Current value:");
+  lcd.setCursor(0,3);
+  lcd.print("Increment     Accept");
+  while(lButton.check() || rButton.check()){delay(100);}
+
+  int deviceId = 1;
+  int i = 0;
+  while (true) {
+    i++;
+    if (lButton.check()) {
+      deviceId++;
+      if (deviceId == 33) {
+        deviceId = 1;
+      }
+      while(lButton.check()){}
+    }
+    if (rButton.check()) {
+      break;
+    }
+    lcd.setCursor(0,1);
+    lcd.print(deviceId);
+    delay(10);
+  }
+  lcd.setCursor(0,2);
+  lcd.print("      Accepted!     ");
+  lcd.setCursor(0,3);
+  lcd.print("                    ");
+  delay(2000);
+  
+  return deviceId;
+}
+
 void loop() {
+  noInterrupts();
+  lcd.setCursor(0, 0);
+  lcd.print(roomName);
   lcd.setCursor(0, 1);
-  lcd.print(counter);
+  lcd.print(message1L1);
   lcd.setCursor(0, 2);
-  lcd.print(message);
+  lcd.print(message1L2); 
+  
+  if (lbutton_status == LBUTTON_RESERVE) {
+    
+  } else if (lbutton_status == LBUTTON_EXTEND) {
+  
+  } else {
+  
+  }
+  
+  if (rbutton_status == RBUTTON_ENABLED) {
+    
+  } else {
+  
+  }  
+  
+  
+  
+  if (statusLed == LED_RED) {
+    
+  } else if (statusLed == LED_GREEN) {
+    
+  } else if (statusLed == LED_YELLOW) {
+    
+  }
+
+  interrupts();
+
   delay(100);
 }
 
@@ -36,9 +231,41 @@ void requestHandler() {
 }
 
 void receiveHandler(int numBytes) {
-  lcd.setCursor(0, 3);
-  lcd.print(numBytes);
-  for (int i = 0; i < numBytes; i++) {
-    message[i] = Wire.read();
+  int messageType = Wire.read();
+  
+  switch(messageType) {
+    case ROOM_NAME:
+      readString(roomName, numBytes - 1);
+      break;
+    case MESSAGE1L1:
+      readString(message1L1, numBytes - 1);
+      break;
+    case MESSAGE1L2:
+      readString(message1L2, numBytes - 1);
+      break;
+    case MESSAGE2L1:
+      readString(message2L1, numBytes - 1);
+      break;
+    case MESSAGE2L2:
+      readString(message2L2, numBytes - 1);
+      break;
+    case MESSAGE3L1:
+      readString(message3L1, numBytes - 1);
+      break;
+    case MESSAGE3L2:
+      readString(message3L2, numBytes - 1);
+      break;
+    case FLAGS:
+      int vector = Wire.read();
+      lbutton_status = (vector & LBUTTON_MASK);
+      rbutton_status = (vector & RBUTTON_MASK) >> 2;
+      statusLed = (vector & LED_MASK) >> 4;
+      break;
+  }
+}
+
+void readString(char* dest, int len) {
+  for (int i = 0; i < len; i++) {
+    dest[i] = Wire.read();
   }
 }
