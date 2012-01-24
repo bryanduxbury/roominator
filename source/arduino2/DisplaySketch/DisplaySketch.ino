@@ -3,43 +3,23 @@
 #include <EEPROM.h>
 #include <BounceButton.h>
 
-#define ROOM_NAME 0
-char roomName[21];
+#define L1 1
+#define L2 2
+#define L3 3
+#define L4 4
 
-#define MESSAGE1L1 1
-#define MESSAGE1L2 2
-#define MESSAGE2L1 3
-#define MESSAGE2L2 4
-#define MESSAGE3L1 5
-#define MESSAGE3L2 6
-
-char message1L1[21];
-char message1L2[21];
-char message2L1[21];
-char message2L2[21];
-char message3L1[21];
-char message3L2[21];
+char * line1 = "                    ";
+char * line2 = "   waiting to sync  ";
+char * line3 = "     with master    ";
+char * line4 = "                    ";
 
 #define FLAGS 7
-
-#define LBUTTON_DISABLED 1
-#define LBUTTON_RESERVE 2
-#define LBUTTON_EXTEND 3
-
-#define LBUTTON_MASK 0x03
-int lbutton_status = LBUTTON_DISABLED;
-
-#define RBUTTON_MASK 0x04
-#define RBUTTON_ENABLED 1
-#define RBUTTON_DISABLED 2
-int rbutton_status = RBUTTON_DISABLED;
 
 #define LED_NONE 0
 #define LED_RED 1
 #define LED_YELLOW 2
 #define LED_GREEN 3
 
-#define LED_MASK 0x18
 int statusLed = LED_NONE;
 
 unsigned int counter = 0;
@@ -54,6 +34,9 @@ LiquidCrystal lcd(13,12,11,10,9,8);
 #define RBUTTON_PIN 3
 BounceButton lButton(LBUTTON_PIN);
 BounceButton rButton(RBUTTON_PIN);
+
+volatile unsigned int lButtonCounter = 0;
+volatile unsigned int rButtonCounter = 0;
 
 void setup() {
   lButton.initialize();
@@ -71,7 +54,8 @@ void setup() {
   
   setOrResetDeviceId();
   
-  Wire.begin(1);
+  Wire.begin(EEPROM.read(0));
+//  Wire.begin(1);
   Wire.onRequest(requestHandler);
   Wire.onReceive(receiveHandler);
 }
@@ -188,78 +172,67 @@ int getId() {
 }
 
 void loop() {
-  noInterrupts();
-  lcd.setCursor(0, 0);
-  lcd.print(roomName);
-  lcd.setCursor(0, 1);
-  lcd.print(message1L1);
-  lcd.setCursor(0, 2);
-  lcd.print(message1L2); 
-  
-  if (lbutton_status == LBUTTON_RESERVE) {
-    
-  } else if (lbutton_status == LBUTTON_EXTEND) {
-  
-  } else {
-  
+  if (lButton.check()) {
+    lButtonCounter++;
+  }
+
+  if (rButton.check()) {
+    rButtonCounter++;
   }
   
-  if (rbutton_status == RBUTTON_ENABLED) {
-    
-  } else {
+  noInterrupts();
+  lcd.setCursor(0, 0);
+  lcd.print(line1);
+  lcd.setCursor(0, 1);
+  lcd.print(line2);
+  lcd.setCursor(0, 2);
+  lcd.print(line3);
+  lcd.setCursor(0, 3);
+  lcd.print(line4);
   
-  }  
+  // toggle all leds off
+  digitalWrite(RED_PIN, HIGH);
+  digitalWrite(YELLOW_PIN, HIGH);
+  digitalWrite(GREEN_PIN, HIGH);
   
-  
-  
+  // turn on the selected one, if any
   if (statusLed == LED_RED) {
-    
+    digitalWrite(RED_PIN, LOW);
   } else if (statusLed == LED_GREEN) {
-    
+    digitalWrite(GREEN_PIN, LOW);
   } else if (statusLed == LED_YELLOW) {
-    
+    digitalWrite(YELLOW_PIN, LOW);
   }
 
   interrupts();
 
-  delay(100);
+  delay(25);
 }
 
 void requestHandler() {
-  counter++;
-  Wire.write(counter);
+  Wire.write(lButtonCounter | (rButtonCounter << 4));
+  lButtonCounter = 0;
+  rButtonCounter = 0;
 }
 
 void receiveHandler(int numBytes) {
   int messageType = Wire.read();
   
   switch(messageType) {
-    case ROOM_NAME:
-      readString(roomName, numBytes - 1);
+    case L1:
+      readString(line1, numBytes - 1);
       break;
-    case MESSAGE1L1:
-      readString(message1L1, numBytes - 1);
+    case L2:
+      readString(line2, numBytes - 1);
       break;
-    case MESSAGE1L2:
-      readString(message1L2, numBytes - 1);
+    case L3:
+      readString(line3, numBytes - 1);
       break;
-    case MESSAGE2L1:
-      readString(message2L1, numBytes - 1);
-      break;
-    case MESSAGE2L2:
-      readString(message2L2, numBytes - 1);
-      break;
-    case MESSAGE3L1:
-      readString(message3L1, numBytes - 1);
-      break;
-    case MESSAGE3L2:
-      readString(message3L2, numBytes - 1);
-      break;
+    case L4:
+      readString(line4, numBytes - 1);
+      break;      
     case FLAGS:
-      int vector = Wire.read();
-      lbutton_status = (vector & LBUTTON_MASK);
-      rbutton_status = (vector & RBUTTON_MASK) >> 2;
-      statusLed = (vector & LED_MASK) >> 4;
+      statusLed = Wire.read();
       break;
   }
 }
