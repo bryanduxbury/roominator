@@ -14,9 +14,9 @@
         %td
           = r.room_name
         %td
-          =# r.current_event
+          = (r.next_start && r.next_end && r.next_start <= Time.now && r.next_end > Time.now) ? "Yes" : "No"
         %td
-          =# r.next_event
+          = (r.next_start && r.next_start > Time.now) ? r.next_start.strftime("%I:%M%p %m/%d") : r.next_next_start ? r.next_next_start.strftime("%I:%M%p %m/%d %Z") : "N/A"
         %td
           =# reserve link
 

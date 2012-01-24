@@ -38,25 +38,25 @@ class RoomController < ApplicationController
   def report
     room_number                 = params[:id].to_i
     current_room                = Room.find_by_room_number(room_number)
-    new_reserved_button_presses = params[:rsv].to_i
-    new_cancel_button_presses   = params[:cancel].to_i
+    # new_reserved_button_presses = params[:rsv].to_i
+    # new_cancel_button_presses   = params[:cancel].to_i
 
     room_name = current_room.room_name.center(20, " ")
 
-    reserved_at = Time.at(current_room.next_reservation_at)
+    reserved_at = Time.at(current_room.next_start)
     puts Time.now
     puts reserved_at
-    time_until_next_reservation = Time.now.to_i - reserved_at.to_i
+    time_until_next_reservation = reserved_at.to_i - Time.now.to_i
     puts time_until_next_reservation
     lbutton = LBUTTON_DISABLED;
     rbutton = RBUTTON_DISABLED;
     led = LED_NONE;
 
-    if time_until_next_reservation > 0
+    if time_until_next_reservation <= 0
       # reservation is currently happening
-      msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
-      msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
-      msg3Line1, msg3Line2 = split_across_lines("Until #{(Time.now + current_room.reservation_duration_secs).strftime("%I:%M%p %m/%d")}")
+      msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.next_reserved_by}")
+      msg2Line1, msg2Line2 = split_across_lines("For #{current_room.next_desc}")
+      msg3Line1, msg3Line2 = split_across_lines("Until #{current_room.next_end.strftime("%I:%M%p %m/%d")}")
       led = LED_RED
       rbutton = RBUTTON_ENABLED
       lbutton = LBUTTON_EXTEND
@@ -65,7 +65,8 @@ class RoomController < ApplicationController
       msg1Line1, msg1Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
       msg2Line1, msg2Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
       msg3Line1, msg3Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
-      if (time_until_next_reservation > -15*60)
+      if (time_until_next_reservation < Room::EVENT_LENGTH_INCREMENT)
+        # less than 15 min until next reso
         led = LED_YELLOW
       else
         led = LED_GREEN
@@ -130,7 +131,7 @@ class RoomController < ApplicationController
       room.calendar_name = params["text_c_name_#{row}"]
       room.calendar_id   = params["text_c_id_#{row}"]
       room.room_name     = params["text_r_name_#{row}"]
-      room.room_number   = params["text_r_number_#{row}"]
+      room.display_id   = params["text_r_number_#{row}"]
       room.save!
     end
     

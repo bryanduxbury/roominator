@@ -2,7 +2,7 @@ class Room < ActiveRecord::Base
 
   # require 'yaml'
   # 
-  #   EVENT_LENGTH_INCREMENT = 15.minutes.to_i
+    EVENT_LENGTH_INCREMENT = 15.minutes.to_i
   #   REFRESH_PERIOD = 1.minute.to_i
   #   EVENT_TITLE = "Roomination"
   #   STATUS_MEETING_NOW = 1

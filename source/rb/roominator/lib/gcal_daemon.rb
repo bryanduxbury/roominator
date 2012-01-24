@@ -11,18 +11,18 @@ class GcalDaemon
         puts "working on room #{room.room_name}"
         if cal = @cal_service.calendars.find{|c| CGI.unescape(c.id) == room.calendar_id}
           puts "found a calendar: #{cal}"
-          current_event = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}.first
-          # puts current_event.start_time
-          # puts current_event.end_time
-          # puts current_event.title
-          # puts current_event.attendees.inspect
-          # puts current_event.attendees.select{|a| a[:role] == "organizer"}.first[:name]
-          # puts [current_event.methods - Object.methods].sort.inspect
-          if current_event
-            room.event_desc = current_event.title
-            room.next_reservation_at = current_event.start_time
-            room.reservation_duration_secs = current_event.end_time - current_event.start_time
-            room.reserved_by = current_event.attendees.select{|a| a[:role] == "organizer"}.first[:name]
+          events = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}
+          next_event = events.first
+          next_next_event = events.second
+          if next_event
+            room.next_desc = next_event.title
+            room.next_start = next_event.start_time
+            room.next_end = next_event.end_time 
+            room.next_reserved_by = next_event.attendees.select{|a| a[:role] == "organizer"}.first[:name]
+            room.save!
+          end
+          if next_next_event
+            room.next_next_start = next_next_event.start_time
             room.save!
           end
         end
