@@ -11,7 +11,7 @@
 char * line1 = "                    ";
 char * line2 = "   waiting to sync  ";
 char * line3 = "     with master    ";
-char * line4 = "                    ";
+char line4[21];
 
 #define FLAGS 7
 
@@ -20,7 +20,7 @@ char * line4 = "                    ";
 #define LED_YELLOW 2
 #define LED_GREEN 3
 
-int statusLed = LED_NONE;
+volatile int statusLed = LED_NONE;
 
 unsigned int counter = 0;
 
@@ -39,6 +39,9 @@ volatile unsigned int lButtonCounter = 0;
 volatile unsigned int rButtonCounter = 0;
 
 void setup() {
+  strcpy(line4, line1);
+  
+//  Serial.begin(9600);
   lButton.initialize();
   rButton.initialize();
   
@@ -180,7 +183,7 @@ void loop() {
     rButtonCounter++;
   }
   
-  noInterrupts();
+//  noInterrupts();
   lcd.setCursor(0, 0);
   lcd.print(line1);
   lcd.setCursor(0, 1);
@@ -204,7 +207,7 @@ void loop() {
     digitalWrite(YELLOW_PIN, LOW);
   }
 
-  interrupts();
+//  interrupts();
 
   delay(25);
 }
@@ -217,22 +220,29 @@ void requestHandler() {
 
 void receiveHandler(int numBytes) {
   int messageType = Wire.read();
-  
+//  Serial.print("Reading message type ");
+//  Serial.print(messageType);
+
   switch(messageType) {
     case L1:
       readString(line1, numBytes - 1);
+//      Serial.println(line1);
       break;
     case L2:
       readString(line2, numBytes - 1);
+//      Serial.println(line2);
       break;
     case L3:
       readString(line3, numBytes - 1);
+//      Serial.println(line3);
       break;
     case L4:
       readString(line4, numBytes - 1);
+//      Serial.println(line4);
       break;      
     case FLAGS:
       statusLed = Wire.read();
+//      Serial.println();
       break;
   }
 }
