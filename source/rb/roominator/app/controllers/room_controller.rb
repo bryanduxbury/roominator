@@ -36,10 +36,10 @@ class RoomController < ApplicationController
   # gives slave id, reserved_button_presses, cancel_button_presses
   # returns current information
   def report
-    room_number                 = params[:id].to_i
-    current_room                = Room.find_by_room_number(room_number)
-    # new_reserved_button_presses = params[:rsv].to_i
-    # new_cancel_button_presses   = params[:cancel].to_i
+    display_id = params[:id].to_i
+    current_room = Room.find_by_display_id(display_id)
+    reserved_pressed = params[:rsv] == 1
+    cancel_pressed = params[:cancel] == 1
 
     room_name = current_room.room_name.center(20, " ")
 

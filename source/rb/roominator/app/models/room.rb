@@ -4,7 +4,10 @@ class Room < ActiveRecord::Base
   # 
     EVENT_LENGTH_INCREMENT = 15.minutes.to_i
   #   REFRESH_PERIOD = 1.minute.to_i
-  #   EVENT_TITLE = "Roomination"
+    EVENT_TITLE = "Roomination"
+    ROOMINATOR_NAME = "Roominator"
+    ROOMINATOR_EMAIL = "roominator.test@gmail.com"
+    ROOMINATOR_CAL_ID = "roominator.test@gmail.com"
   #   STATUS_MEETING_NOW = 1
   #   STATUS_MEETING_SOON = 2
   #   STATUS_NO_MEETING = 3
