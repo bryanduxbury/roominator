@@ -24,9 +24,11 @@ byte app_server[4];
 #define SUBNET 14
 #define APP_SERVER 18
 
-Client *client;
+//Client *client;
 
 LongWireMaster wireMaster(sizeof(DownstreamDataStruct));
+
+DownstreamDataStruct FAILED_CONNECTION;
 
 void setup() {
   Serial.begin(9600);  //For debugging, take out eventually
@@ -43,13 +45,39 @@ void setup() {
 
   wireMaster.begin();
   Ethernet.begin(mac, ip, gateway, subnet);
+
+  strcpy(FAILED_CONNECTION.roomName,  "waiting to sync     \0");
+  FAILED_CONNECTION.roomName[20] = '\0';
+  
+  strcpy(FAILED_CONNECTION.msg1Line1, "Failed to reach     \0");
+  FAILED_CONNECTION.msg1Line1[20] = '\0';
+  
+  strcpy(FAILED_CONNECTION.msg1Line2, "app server          \0");
+  FAILED_CONNECTION.msg1Line2[20] = '\0';
+  
+  strcpy(FAILED_CONNECTION.msg2Line1, "message 2           \0");
+  FAILED_CONNECTION.msg2Line1[20] = '\0';
+  
+  strcpy(FAILED_CONNECTION.msg2Line2, "app server          \0");
+  FAILED_CONNECTION.msg2Line2[20] = '\0';
+  
+  strcpy(FAILED_CONNECTION.msg3Line1, "message 3           \0");
+  FAILED_CONNECTION.msg3Line1[20] = '\0';
+  
+  strcpy(FAILED_CONNECTION.msg3Line2, "app server          \0");  
+  FAILED_CONNECTION.msg3Line2[20] = '\0';
+  
+  FAILED_CONNECTION.statusLed = LED_RED;
+  
+  FAILED_CONNECTION.lbutton_status = LBUTTON_RESERVE;
+  FAILED_CONNECTION.rbutton_status = RBUTTON_DISABLED;
 }
 
 void loop()
 {
-  if (client == NULL) {
-    client = &Client(app_server, 80);
-  }
+//  if (client == NULL) {
+//    client = &Client(app_server, 80);
+//  }
 
   int payload;
   int cancel;
@@ -57,9 +85,8 @@ void loop()
 
   //Loop over addresses 1 thru 9
   for(int i = 1; i < 10; i++) {
-    Serial.println("before");
     Wire.requestFrom(i, 1); //request 1 bytes from slave
-    Serial.println("after");
+
 
     //if the slave is responsive...
     if (Wire.available()) {
@@ -76,34 +103,53 @@ void loop()
 
       char message[100];
       generatePostRequest(i, reserveCount, cancel, message);
- 
-      while(!client->connect()) {
-        Serial.println("Could not connect, trying again");
+      
+      int attempt = 0;
+      for (; attempt < 5; attempt++) {
+        if (!client->connect()) {
+          Serial.println("Could not connect, trying again");
+          continue;
+        }
+        break;
+      }
+      if (attempt==5) {
+        Serial.println("Failed to connect to the server.");
+        char response[sizeof(DownstreamDataStruct)];
+        memcpy(response, &FAILED_CONNECTION, sizeof(DownstreamDataStruct));
+        for (int i = 0; i < 109; i++) {
+          Serial.print((int)response[i]);
+          Serial.print(" ");
+        }
+        Serial.println();
+        sendDownstreamPacket(i, response);
+//        client->stop();
+        continue;
       }
       Serial.println("Connected to server, sending request");
       //Send request
-      client->println(message);
-      client->println();
+//      client->println(message);
+//      client->println();
 
       Serial.println("Waiting for server response");
-      while(!client->available()) {delay(10);}
+//      while(!client->available()) {delay(10);}
 
       Serial.println("Got response from server");
 
       char response[sizeof(DownstreamDataStruct)];
       parseHttpResponse(response);
-//      for (int i = 0; i < 109; i++) {
-//        Serial.println((int)response[i]);
-//      }
+      for (int i = 0; i < 109; i++) {
+        Serial.println((int)response[i]);
+      }
       sendDownstreamPacket(i, response);
 
-      client->stop();
+//      client->stop();
       Serial.println("Disconnected from server");
     } else {
       Serial.print("Slave was not responsive: ");
       Serial.println(i);
     }
   }
+  delay(1000);
 }
 
 void sendDownstreamPacket(int id, char* message) {
