@@ -6,7 +6,7 @@
     <% @rooms.each_with_index do |room, i| %>
       // create_new_row(room_number, room_name, calendar_id, calendar_name)
       create_new_row(<%= "
-        #{room.room_number},
+        #{room.display_id},
         '#{CGI::escapeHTML(room.room_name.gsub("\\","\\\\\\\\"))}',
         '#{CGI::escapeHTML(room.calendar_id)}',
         '#{CGI::escapeHTML(room.calendar_name.gsub("\\","\\\\\\\\"))}'
