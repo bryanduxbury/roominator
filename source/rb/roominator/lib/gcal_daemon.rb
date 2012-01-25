@@ -105,5 +105,8 @@ end
 
 if $0 == __FILE__
   require "config/environment.rb"
+  # require 'yaml'
+  # auth_data = YAML::load(File.open("config/authentication.yml"))
+  # GcalDaemon.new(auth_data['email'], auth_data['password']).run
   GcalDaemon.new(ARGV.shift, ARGV.shift, ARGV.shift.to_i).run
 end

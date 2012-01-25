@@ -43,7 +43,7 @@ class RoomController < ApplicationController
     
     room_name = current_room.room_name.center(20, " ")
 
-    reserved_at = current_room.next_start.time
+    reserved_at = current_room.next_start.localtime
     time_until_next_reservation = reserved_at.to_i - Time.now.to_i
     lbutton = LBUTTON_DISABLED;
     rbutton = RBUTTON_DISABLED;
@@ -53,7 +53,7 @@ class RoomController < ApplicationController
       # reservation is currently happening
       msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.next_reserved_by}")
       msg2Line1, msg2Line2 = split_across_lines("For #{current_room.next_desc}")
-      msg3Line1, msg3Line2 = split_across_lines("Until #{current_room.next_end.strftime("%I:%M%p %m/%d")}")
+      msg3Line1, msg3Line2 = split_across_lines("Until #{current_room.next_end.localtime.strftime("%I:%M%p %m/%d")}")
       led = LED_RED
       rbutton = RBUTTON_ENABLED
       if current_room.next_next_start - current_room.next_end >= Room::EVENT_LENGTH_INCREMENT
