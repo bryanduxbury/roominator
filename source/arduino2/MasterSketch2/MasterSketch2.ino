@@ -49,6 +49,10 @@ void loop() {
       if (client.connect(appServerAddr, 80)) {
         client.print("GET /room/report?id=");
         client.print(i);
+        client.print("&rsv=");
+        client.print((statusCode & 0x0f) > 0 ? "1" : "0");
+        client.print("&cancel=");
+        client.print((statusCode & 0xf0) > 0 ? "1" : "0");
         client.println(" HTTP/1.0");
         client.println();
         
