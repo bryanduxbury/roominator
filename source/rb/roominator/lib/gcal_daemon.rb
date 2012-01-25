@@ -13,10 +13,15 @@ class GcalDaemon
   def run
     while true
       Room.find(:all).each do |room|
-        # puts "working on room #{room.room_name}"
+        # puts "working on room #{room.room_name} with cal #{room.calendar_id}"
         if cal = @cals_by_id[room.calendar_id]
           # puts "found a calendar: #{cal}"
-          events = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}
+          begin
+            events = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}
+          rescue Exception => e
+            puts "Unexpected Exception: #{e}"
+            next
+          end
           
           # Handle button presses
           if room.reserve_pressed && room.cancel_pressed

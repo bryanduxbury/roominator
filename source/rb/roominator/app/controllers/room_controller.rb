@@ -38,6 +38,7 @@ class RoomController < ApplicationController
   def report
     display_id = params[:id].to_i
     current_room = Room.find_by_display_id(display_id)
+    #TODO if cannot find current_room, display message
     reserve_pressed = params[:rsv].to_i == 1
     cancel_pressed = params[:cancel].to_i == 1
     
@@ -88,13 +89,13 @@ class RoomController < ApplicationController
       puts "$$$$$$$$$$Nothing Happening"
     end
 
-    data = [200, room_name, 0,
-      msg1Line1, 0, msg1Line2, 0,
-      msg2Line1, 0, msg2Line2, 0,
-      msg3Line1, 0, msg3Line2, 0,
-      lbutton,
-      rbutton,
-      led].pack("C" + ("A20C" * 7) + "CCC")
+    data = [room_name, 0,
+      msg1Line1, 0,# msg1Line2, 0,
+      msg2Line1, 0,# msg2Line2, 0,
+      msg3Line1, 0, #msg3Line2, 0,
+      # lbutton,
+      # rbutton,
+      led].pack(("A20C" * 4) + "C")
     #delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     #delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
 
