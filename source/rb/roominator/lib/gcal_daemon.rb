@@ -13,9 +13,9 @@ class GcalDaemon
   def run
     while true
       Room.find(:all).each do |room|
-        puts "working on room #{room.room_name}"
-        if cal = @cal_service.calendars.find{|c| CGI.unescape(c.id) == room.calendar_id}
-          puts "found a calendar: #{cal}"
+        # puts "working on room #{room.room_name}"
+        if cal = @cals_by_id[room.calendar_id]
+          # puts "found a calendar: #{cal}"
           events = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}
           
           # Handle button presses
@@ -29,23 +29,10 @@ class GcalDaemon
           elsif room.reserve_pressed
             handle_reserve_pressed(room, events)
           elsif room.cancel_pressed
-            handle_cancel_pressed(room)
+            handle_cancel_pressed(room, events)
           end
           
-          # Update rooms events
-          next_event = events.first
-          next_next_event = events.second
-          if next_event
-            room.next_desc = next_event.title
-            room.next_start = next_event.start_time
-            room.next_end = next_event.end_time 
-            room.next_reserved_by = next_event.attendees.select{|a| a[:role] == "organizer"}.first[:name]
-            room.save!
-          end
-          if next_next_event
-            room.next_next_start = next_next_event.start_time
-            room.save!
-          end
+          room.update_next_events(events)
         end
       end
       sleep @sleep_time.to_f/1000
@@ -61,6 +48,8 @@ class GcalDaemon
     # check if should extend reso or make new
     if room.next_start && room.next_end && room.next_start < Time.now && room.next_end > Time.now
       # extend endtime of current event
+      puts "$$$$$$$$$$#{room.room_name} extending current reso"
+      #TODO may wish to extend the event for all attendees as well
       cur_event = events.find{|event| event.start_time == room.next_start && event.title == room.next_desc}
       if cur_event
         cur_event.end_time = get_end_time(cur_event.end_time, room.next_next_start)
@@ -70,6 +59,7 @@ class GcalDaemon
         puts "Couldn't find event #{room.next_desc} at #{room.next_start} reserved by #{room.next_reserved_by}"
       end
     else
+      puts "$$$$$$$$$$#{room.room_name} creating new reso"
       # create new reservation
       event = GCal4Ruby::Event.new(@cal_service)
       event.calendar = @roominator_cal
@@ -77,20 +67,22 @@ class GcalDaemon
       event.where = room.room_name
       event.start_time = Time.now
       event.end_time = get_end_time(event.start_time, room.next_start)
-      event.attendees = [{:name => room.room_name, :email => room.calender_id, :role => "Attendee", :status => "Attending"}]
+      event.attendees = [{:name => room.room_name, :email => room.calendar_id, :role => "Attendee", :status => "Attending"}]
       event.save
     end
   end
   
   # Assumes it has already been verified that an event is occuring
-  def handle_cancel_pressed(room)
+  def handle_cancel_pressed(room, events)
     room.cancel_pressed = false
     room.save!
     
     if room.next_start && room.next_end && room.next_start < Time.now && room.next_end > Time.now
       cur_event = events.find{|event| event.start_time == room.next_start && event.title == room.next_desc}
       if cur_event
+        puts "$$$$$$$$$$#{room.room_name} cancelling current reso"
         cur_event.delete
+        #TODO may wish to delete the event for all attendees as well
       else
         #TODO Unexpected Error
         puts "Couldn't find event #{room.next_desc} at #{room.next_start} reserved by #{room.next_reserved_by}"
@@ -102,7 +94,7 @@ class GcalDaemon
   end
   
   def get_end_time(to_extend, next_start_time)
-    end_time = to_extend + ROOM::EVENT_LENGTH_INCREMENT
+    end_time = to_extend + Room::EVENT_LENGTH_INCREMENT
     if next_start_time && next_start_time < end_time
       # make sure not to end an event into the start of the next event
       end_time = next_start_time
@@ -113,5 +105,5 @@ end
 
 if $0 == __FILE__
   require "config/environment.rb"
-  GCal4RubyDaemon.new(ARGV.shift, ARGV.shift, ARGV.shift.to_i).run
+  GcalDaemon.new(ARGV.shift, ARGV.shift, ARGV.shift.to_i).run
 end

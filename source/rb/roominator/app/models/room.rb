@@ -1,13 +1,28 @@
 class Room < ActiveRecord::Base
 
   # require 'yaml'
-  # 
-    EVENT_LENGTH_INCREMENT = 15.minutes.to_i
-  #   REFRESH_PERIOD = 1.minute.to_i
-    EVENT_TITLE = "Roomination"
-    ROOMINATOR_NAME = "Roominator"
-    ROOMINATOR_EMAIL = "roominator.test@gmail.com"
-    ROOMINATOR_CAL_ID = "roominator.test@gmail.com"
+  EVENT_LENGTH_INCREMENT = 15.minutes.to_i
+#   REFRESH_PERIOD = 1.minute.to_i
+  EVENT_TITLE = "Roomination"
+  ROOMINATOR_NAME = "Roominator"
+  ROOMINATOR_EMAIL = "roominator.test@gmail.com"
+  ROOMINATOR_CAL_ID = "roominator.test@gmail.com"
+  
+  def update_next_events(events = [])
+    next_event = events.first
+    next_next_event = events.second
+    if next_event
+      self.next_desc = next_event.title
+      self.next_start = next_event.start_time
+      self.next_end = next_event.end_time 
+      self.next_reserved_by = next_event.attendees.select{|a| a[:role] == "organizer"}.first[:name]
+    end
+    if next_next_event
+      self.next_next_start = next_next_event.start_time
+    end
+    save!
+  end
+    
   #   STATUS_MEETING_NOW = 1
   #   STATUS_MEETING_SOON = 2
   #   STATUS_NO_MEETING = 3
