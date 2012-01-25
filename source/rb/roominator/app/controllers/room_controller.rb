@@ -33,39 +33,41 @@ class RoomController < ApplicationController
     [str[0..20], str[20..40]]
   end
 
-  # gives slave id, reserved_button_presses, cancel_button_presses
+  # gives slave id, reserve_pressed, cancel_pressed
   # returns current information
   def report
-    room_number                 = params[:id].to_i
-    current_room                = Room.find_by_room_number(room_number)
-    new_reserved_button_presses = params[:rsv].to_i
-    new_cancel_button_presses   = params[:cancel].to_i
-
+    display_id = params[:id].to_i
+    current_room = Room.find_by_display_id(display_id)
+    #TODO if cannot find current_room, display message
+    reserve_pressed = params[:rsv].to_i == 1
+    cancel_pressed = params[:cancel].to_i == 1
+    
     room_name = current_room.room_name.center(20, " ")
 
-    reserved_at = Time.at(current_room.next_reservation_at)
-    puts Time.now
-    puts reserved_at
-    time_until_next_reservation = Time.now.to_i - reserved_at.to_i
-    puts time_until_next_reservation
+    reserved_at = current_room.next_start.localtime
+    time_until_next_reservation = reserved_at.to_i - Time.now.to_i
     lbutton = LBUTTON_DISABLED;
     rbutton = RBUTTON_DISABLED;
     led = LED_NONE;
 
-    if time_until_next_reservation > 0
+    if time_until_next_reservation <= 0
       # reservation is currently happening
-      msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
-      msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
-      msg3Line1, msg3Line2 = split_across_lines("Until #{(Time.now + current_room.reservation_duration_secs).strftime("%I:%M%p %m/%d")}")
+      msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.next_reserved_by}")
+      msg2Line1, msg2Line2 = split_across_lines("For #{current_room.next_desc}")
+      msg3Line1, msg3Line2 = split_across_lines("Until #{current_room.next_end.localtime.strftime("%I:%M%p %m/%d")}")
       led = LED_RED
       rbutton = RBUTTON_ENABLED
-      lbutton = LBUTTON_EXTEND
+      if current_room.next_next_start - current_room.next_end >= Room::EVENT_LENGTH_INCREMENT
+        # at least 15 min available to extend this reso before the next event
+        lbutton = LBUTTON_EXTEND
+      end
     else
       # reservation is for a future date
       msg1Line1, msg1Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
       msg2Line1, msg2Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
       msg3Line1, msg3Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
-      if (time_until_next_reservation > -15*60)
+      if (time_until_next_reservation < Room::EVENT_LENGTH_INCREMENT)
+        # less than 15 min until next reso
         led = LED_YELLOW
       else
         led = LED_GREEN
@@ -73,17 +75,27 @@ class RoomController < ApplicationController
       end
 
     end
+    
+    # Do nothing if both buttons were pressed
+    if reserve_pressed && !cancel_pressed && lbutton != LBUTTON_DISABLED
+      current_room.reserve_pressed = true
+      current_room.save!
+      puts "$$$$$$$$$$#{current_room.room_name} set to reserve/extend"
+    elsif cancel_pressed && !reserve_pressed && rbutton != RBUTTON_DISABLED
+      current_room.cancel_pressed = true
+      current_room.save!
+      puts "$$$$$$$$$$#{current_room.room_name} set to cancel reso"
+    else
+      puts "$$$$$$$$$$Nothing Happening"
+    end
 
-    data = [200, room_name, 0,
-      msg1Line1, 0, msg1Line2, 0,
-      msg2Line1, 0, msg2Line2, 0,
-      msg3Line1, 0, msg3Line2, 0,
-      lbutton,
-      rbutton,
-      led].pack("C" + ("A20C" * 7) + "CCC")
-    puts data.length
-    puts data.inspect
-
+    data = [room_name, 0,
+      msg1Line1, 0,# msg1Line2, 0,
+      msg2Line1, 0,# msg2Line2, 0,
+      msg3Line1, 0, #msg3Line2, 0,
+      # lbutton,
+      # rbutton,
+      led].pack(("A20C" * 4) + "C")
     #delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     #delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
 
@@ -130,7 +142,7 @@ class RoomController < ApplicationController
       room.calendar_name = params["text_c_name_#{row}"]
       room.calendar_id   = params["text_c_id_#{row}"]
       room.room_name     = params["text_r_name_#{row}"]
-      room.room_number   = params["text_r_number_#{row}"]
+      room.display_id   = params["text_r_number_#{row}"]
       room.save!
     end
     

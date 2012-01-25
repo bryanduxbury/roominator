@@ -1,23 +1,26 @@
 one:
+  id: 1
   calendar_name: "Atlantis (np)"
   room_name: Atlantis
-  room_number: 1
-  calendar_id: gisman%40oberlin.edu
-  reserved_button_presses: 0
-  cancel_button_presses: 0
+  calendar_id: "7jndk0trrstnl7hfvirgfphcvo@group.calendar.google.com"
+  display_id: 1
+  reserve_pressed: false
+  cancel_pressed: false
 
 two:
+  id: 2
   calendar_name: "Thule (np)"
   room_name: Thule
-  room_number: 2
-  calendar_id: gisman%40oberlin.edu
-  reserved_button_presses: 0
-  cancel_button_presses: 0
+  calendar_id: "4ia8ef8of4kc617bckt02lk7qg@group.calendar.google.com"
+  display_id: 2
+  reserve_pressed: false
+  cancel_pressed: false
 
 three:
+  id: 3
   calendar_name: "N America (p+proj)"
   room_name: "North America"
-  room_number: 3
-  calendar_id: gisman%40oberlin.edu
-  reserved_button_presses: 0
-  cancel_button_presses: 0
+  calendar_id: "vgp9rlg20asp8qefu9irdeedko@group.calendar.google.com"
+  display_id: 3
+  reserve_pressed: false
+  cancel_pressed: false

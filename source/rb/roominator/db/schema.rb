@@ -10,25 +10,22 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110809060220) do
+ActiveRecord::Schema.define(:version => 20120124014810) do
 
   create_table "rooms", :force => true do |t|
     t.string   "calendar_name"
+    t.string   "calendar_id"
     t.string   "room_name"
+    t.integer  "display_id"
+    t.boolean  "reserve_pressed"
+    t.boolean  "cancel_pressed"
+    t.datetime "next_start"
+    t.datetime "next_end"
+    t.string   "next_reserved_by"
+    t.string   "next_desc"
+    t.datetime "next_next_start"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "room_number"
-    t.string   "calendar_id"
-    t.integer  "reserved_button_presses"
-    t.integer  "cancel_button_presses"
-    t.text     "current_event",             :default => ""
-    t.text     "next_event",                :default => ""
-    t.text     "calendar"
-    t.text     "reserved_by",               :default => ""
-    t.text     "event_desc",                :default => ""
-    t.integer  "free_until_secs"
-    t.integer  "next_reservation_at"
-    t.integer  "reservation_duration_secs"
   end
 
 end
