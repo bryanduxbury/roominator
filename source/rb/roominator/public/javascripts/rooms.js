@@ -10,12 +10,12 @@ function toggle_edit_row(i) {
 }
 
 function create_blank_row() {
-  i = create_new_row("", "", "", "");
+  i = create_new_row("", "", "");
   toggle_edit_row(i);
   $('#cancel_link_' + i).hide();
 }
 
-function create_new_row(room_number, room_name, calendar_id, calendar_name) {
+function create_new_row(room_name, calendar_id, calendar_name) {
   var iteration = $("#rooms_table tr").length - 1;
   
   $("#rooms_table").append(
@@ -24,8 +24,6 @@ function create_new_row(room_number, room_name, calendar_id, calendar_name) {
         "<label name=\"label_r_number_" + iteration + "\" id=\"label_r_number_" + iteration + "\" class=\"edit_" + iteration + "\">" +
           room_number +
         "</label>" +
-        "<input type=text name=\"text_r_number_" + iteration + "\" id=\"text_r_number_" + iteration + "\" class=\"edit_" + iteration + "\" value=\"" + room_number + "\"/ style=\"display:none\">" +
-        "</input>" + 
       "</td>" + 
       "<td>" + // Room Name
         "<label name=\"label_r_name_" + iteration + "\" id=\"label_r_name_" + iteration + "\" class=\"edit_" + iteration + "\">" +
@@ -64,10 +62,3 @@ function create_new_row(room_number, room_name, calendar_id, calendar_name) {
   $("#num_cols").val(iteration+1);
   return iteration;
 }
-
-//%th Room Number
-//%th Room Name
-//%th Calendar ID
-//%th Calendar Name
-//%th Edit Room
-//%th Delete?

@@ -2,12 +2,20 @@ class GcalDaemon
   def initialize(email, password, sleep_time)
     @cal_service = GCal4Ruby::Service.new
     @cal_service.authenticate(email, password)
+    @cal_service.debug = true #DEBUG ON
     @cals_by_id = Hash[@cal_service.calendars.map{|cal| [CGI.unescape(cal.id), cal]}]
     @roominator_cal = @cals_by_id[Room::ROOMINATOR_CAL_ID]
     if !@roominator_cal
       raise "Could not find roominator calendar with id #{Room::ROOMINATOR_CAL_ID} in calendar ids #{@cals_by_id.keys}"
     end
     @sleep_time = sleep_time
+
+    # Clear old requests
+    Room.all.each do |room|
+      room.reserve_pressed = false
+      room.cancel_pressed = false
+      room.save!
+    end
   end
 
   def run
@@ -16,12 +24,7 @@ class GcalDaemon
         # puts "working on room #{room.room_name} with cal #{room.calendar_id}"
         if cal = @cals_by_id[room.calendar_id]
           # puts "found a calendar: #{cal}"
-          begin
-            events = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}
-          rescue Exception => e
-            puts "Unexpected Exception: #{e}"
-            next
-          end
+          events = cal.events.select{|e| e.end_time > Time.now}.sort_by{|e| e.start_time}
           
           # Handle button presses
           if room.reserve_pressed && room.cancel_pressed
@@ -38,6 +41,9 @@ class GcalDaemon
           end
           
           room.update_next_events(events)
+          room.cancel_pressed = false;
+          room.reserve_pressed = false;
+          room.save!
         end
       end
       sleep @sleep_time.to_f/1000
@@ -47,9 +53,6 @@ class GcalDaemon
   # Assumes it has already been verified that a reservation
   # action can occur
   def handle_reserve_pressed(room, events)
-    room.reserve_pressed = false
-    room.save!
-    
     # check if should extend reso or make new
     if room.next_start && room.next_end && room.next_start < Time.now && room.next_end > Time.now
       # extend endtime of current event
@@ -74,19 +77,19 @@ class GcalDaemon
       event.end_time = get_end_time(event.start_time, room.next_start)
       event.attendees = [{:name => room.room_name, :email => room.calendar_id, :role => "Attendee", :status => "Attending"}]
       event.save
+      
+      events.unshift(event)
     end
   end
   
   # Assumes it has already been verified that an event is occuring
   def handle_cancel_pressed(room, events)
-    room.cancel_pressed = false
-    room.save!
-    
     if room.next_start && room.next_end && room.next_start < Time.now && room.next_end > Time.now
       cur_event = events.find{|event| event.start_time == room.next_start && event.title == room.next_desc}
       if cur_event
         puts "$$$$$$$$$$#{room.room_name} cancelling current reso"
         cur_event.delete
+        events.delete(cur_event)
         #TODO may wish to delete the event for all attendees as well
       else
         #TODO Unexpected Error
