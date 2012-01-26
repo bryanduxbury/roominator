@@ -10,13 +10,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120124014810) do
+ActiveRecord::Schema.define(:version => 20120125231150) do
+
+  create_table "displays", :force => true do |t|
+    t.integer  "room_id"
+    t.integer  "prev_msg"
+    t.integer  "prev_led"
+    t.integer  "timer"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "rooms", :force => true do |t|
     t.string   "calendar_name"
     t.string   "calendar_id"
     t.string   "room_name"
-    t.integer  "display_id"
     t.boolean  "reserve_pressed"
     t.boolean  "cancel_pressed"
     t.datetime "next_start"
