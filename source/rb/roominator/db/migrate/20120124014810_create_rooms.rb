@@ -4,7 +4,7 @@ class CreateRooms < ActiveRecord::Migration
       t.string :calendar_name
       t.string  :calendar_id
       t.string :room_name
-      t.integer :display_id #should be made unique
+      t.integer :display_id
       t.boolean :reserve_pressed
       t.boolean :cancel_pressed
       t.timestamp :next_start

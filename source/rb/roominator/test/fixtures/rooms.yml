@@ -3,7 +3,6 @@ one:
   calendar_name: "Atlantis (np)"
   room_name: Atlantis
   calendar_id: "7jndk0trrstnl7hfvirgfphcvo@group.calendar.google.com"
-  display_id: 1
   reserve_pressed: false
   cancel_pressed: false
 
@@ -12,7 +11,6 @@ two:
   calendar_name: "Thule (np)"
   room_name: Thule
   calendar_id: "4ia8ef8of4kc617bckt02lk7qg@group.calendar.google.com"
-  display_id: 2
   reserve_pressed: false
   cancel_pressed: false
 
@@ -21,6 +19,5 @@ three:
   calendar_name: "N America (p+proj)"
   room_name: "North America"
   calendar_id: "vgp9rlg20asp8qefu9irdeedko@group.calendar.google.com"
-  display_id: 3
   reserve_pressed: false
   cancel_pressed: false
