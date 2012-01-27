@@ -1,0 +1,20 @@
+one:
+  id: 1
+  room_id: 1
+  prev_msg: 0
+  prev_led: 0
+  timer: 0
+
+two:
+  id: 2
+  room_id: 2
+  prev_msg: 0
+  prev_led: 0
+  timer: 0
+  
+three:
+  id: 3
+  room_id: 3
+  prev_msg: 0
+  prev_led: 0
+  timer: 0
