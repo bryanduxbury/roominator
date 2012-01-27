@@ -31,7 +31,7 @@ void setup() {
 }
 
 void loop() {
-  for (int i = 0; i < 5; i++) {
+  for (int i = 1; i < 16; i++) {
     Wire.requestFrom(i, 1);
     int statusCode = -1;
     while (Wire.available()) {
@@ -94,19 +94,19 @@ void loop() {
       } else {
         Serial.println("Couldn't connect to app server.");
         sendString(i, 1, failedLine1);
-        delay(50);
+        delay(10);
         sendString(i, 2, failedLine2);
-        delay(50);
+        delay(10);
         sendString(i, 3, failedLine3);
-        delay(50);
+        delay(10);
         sendString(i, 4, failedLine4);
-        delay(50);
+        delay(10);
         sendFlags(i, 0);
       }
       client.stop();
     }
   }
-  delay(1000);
+  delay(100);
 }
 
 void sendString(int addr, int messageCode, char* str) {

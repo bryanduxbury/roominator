@@ -38,51 +38,54 @@ class RoomController < ApplicationController
   def report
     room_number                 = params[:id].to_i
     current_room                = Room.find_by_room_number(room_number)
-    new_reserved_button_presses = params[:rsv].to_i
-    new_cancel_button_presses   = params[:cancel].to_i
-
-    room_name = current_room.room_name.center(20, " ")
-
-    reserved_at = Time.at(current_room.next_reservation_at)
-    puts Time.now
-    puts reserved_at
-    time_until_next_reservation = Time.now.to_i - reserved_at.to_i
-    puts time_until_next_reservation
-    lbutton = LBUTTON_DISABLED;
-    rbutton = RBUTTON_DISABLED;
-    led = LED_NONE;
-
-    if time_until_next_reservation > 0
-      # reservation is currently happening
-      msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
-      msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
-      msg3Line1, msg3Line2 = split_across_lines("Until #{(Time.now + current_room.reservation_duration_secs).strftime("%I:%M%p %m/%d")}")
-      led = LED_RED
-      rbutton = RBUTTON_ENABLED
-      lbutton = LBUTTON_EXTEND
-    else
-      # reservation is for a future date
-      msg1Line1, msg1Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
-      msg2Line1, msg2Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
-      msg3Line1, msg3Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
-      if (time_until_next_reservation > -15*60)
-        led = LED_YELLOW
-      else
-        led = LED_GREEN
-        lbutton = LBUTTON_RESERVE
-      end
-
-    end
-
-    data = [200, room_name, 0,
-      msg1Line1, 0, msg1Line2, 0,
-      msg2Line1, 0, msg2Line2, 0,
-      msg3Line1, 0, msg3Line2, 0,
-      lbutton,
-      rbutton,
-      led].pack("C" + ("A20C" * 7) + "CCC")
-    puts data.length
-    puts data.inspect
+    data = ["line 1", 0, "line 2", 0, "line 3", 0, "line 4", 0, Time.now.sec / 2 % 4].pack(("A20C")*4 + "C")
+    render :text => data
+    # render :text => "server's line 1     \0server's line 2     \0server's line 3     \0server's line 4     \0\2"
+    # new_reserved_button_presses = params[:rsv].to_i
+    # new_cancel_button_presses   = params[:cancel].to_i
+    # 
+    # room_name = current_room.room_name.center(20, " ")
+    # 
+    # reserved_at = Time.at(current_room.next_reservation_at)
+    # puts Time.now
+    # puts reserved_at
+    # time_until_next_reservation = Time.now.to_i - reserved_at.to_i
+    # puts time_until_next_reservation
+    # lbutton = LBUTTON_DISABLED;
+    # rbutton = RBUTTON_DISABLED;
+    # led = LED_NONE;
+    # 
+    # if time_until_next_reservation > 0
+    #   # reservation is currently happening
+    #   msg1Line1, msg1Line2 = split_across_lines("Reserved by #{current_room.reserved_by}")
+    #   msg2Line1, msg2Line2 = split_across_lines("For #{current_room.event_desc}")
+    #   msg3Line1, msg3Line2 = split_across_lines("Until #{(Time.now + current_room.reservation_duration_secs).strftime("%I:%M%p %m/%d")}")
+    #   led = LED_RED
+    #   rbutton = RBUTTON_ENABLED
+    #   lbutton = LBUTTON_EXTEND
+    # else
+    #   # reservation is for a future date
+    #   msg1Line1, msg1Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
+    #   msg2Line1, msg2Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
+    #   msg3Line1, msg3Line2 = split_across_lines("Free until #{reserved_at.strftime("%I:%M%p %m/%d")}")
+    #   if (time_until_next_reservation > -15*60)
+    #     led = LED_YELLOW
+    #   else
+    #     led = LED_GREEN
+    #     lbutton = LBUTTON_RESERVE
+    #   end
+    # 
+    # end
+    # 
+    # data = [200, room_name, 0,
+    #   msg1Line1, 0, msg1Line2, 0,
+    #   msg2Line1, 0, msg2Line2, 0,
+    #   msg3Line1, 0, msg3Line2, 0,
+    #   lbutton,
+    #   rbutton,
+    #   led].pack("C" + ("A20C" * 7) + "CCC")
+    # puts data.length
+    # puts data.inspect
 
     #delta_reserved_button_presses = (new_reserved_button_presses - current_room.reserved_button_presses).modulo(OVERFLOW_VALUE)
     #delta_cancel_button_presses   = (new_cancel_button_presses   -   current_room.cancel_button_presses).modulo(OVERFLOW_VALUE)
@@ -111,7 +114,7 @@ class RoomController < ApplicationController
     # header_in_binary = header.pack("C" * header.length) # "C" specifies: 8-bit unsigned
     # tail_in_binary = tail.pack("C" * tail.length)
     # data = header_in_binary + msg + tail_in_binary
-    render :text => data
+    # render :text => data
   end
 
   def setup_rooms
