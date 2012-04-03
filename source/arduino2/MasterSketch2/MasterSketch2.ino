@@ -25,7 +25,7 @@ byte appServerAddr[] = {10,0,0,1};
 void setup() {
   Ethernet.begin(mac, ip, gateway, mask);
   Wire.begin();
-  Serial.begin(9600);
+//  Serial.begin(9600);
   
   delay(1000);
 }
@@ -38,13 +38,13 @@ void loop() {
       if (statusCode == -1) statusCode = Wire.read();
       Wire.read();
     }
-    Serial.print("Node ");
-    Serial.print(i);
+//    Serial.print("Node ");
+//    Serial.print(i);
     if (statusCode == -1) {
       Serial.println(" is unreachable");
     } else {
-      Serial.print(" is online with status code: ");
-      Serial.println(statusCode);
+//      Serial.print(" is online with status code: ");
+//      Serial.println(statusCode);
       
       if (client.connect(appServerAddr, 80)) {
         client.print("GET /room/report?id=");
@@ -81,7 +81,7 @@ void loop() {
           blob[idx++] = client.read();
         }
         if (idx != 85) {
-          Serial.println("Malformed message!");
+//          Serial.println("Malformed message!");
           // todo: send malformed message notification
         } else {
           // send server's message to display
@@ -92,7 +92,7 @@ void loop() {
           sendFlags(i, (int)(blob[84]));
         }
       } else {
-        Serial.println("Couldn't connect to app server.");
+//        Serial.println("Couldn't connect to app server.");
         sendString(i, 1, failedLine1);
         delay(10);
         sendString(i, 2, failedLine2);
